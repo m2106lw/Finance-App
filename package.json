@@ -11,7 +11,9 @@
   "author": "Matthew Williams",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
     "babel-loader": "^7.1.5",
+    "moment": "^2.22.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-hot-loader": "^4.3.6",

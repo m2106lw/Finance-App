@@ -8,13 +8,17 @@ import Header from "./components/Header";
 class App extends Component {
 	constructor() {
 		super();
+		// This should change in the future
+		this.state = {
+			user_id: 1
+		}
 	}
 	
 	render(){
 		return(
-			<div>
-				<Header />
-				<Main />
+			<div className="main-grid">
+				<div className="main-header"><Header /></div>
+				<div className="main-body"><Main user_id={this.state.user_id}/></div>
 			</div>
 		);
 	}

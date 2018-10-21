@@ -1,6 +1,7 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
 import { Link } from 'react-router-dom';
+const axios = require('axios');
 
 class AccountsMain extends Component {
 	constructor(props) {
@@ -9,7 +10,7 @@ class AccountsMain extends Component {
 			accounts: [],
 			name: "",
 			description: "",
-			user_id: 1
+			error: false
 		}
 		this.handleNewAccount = this.handleNewAccount.bind(this);
 		this.handleAccountChange = this.handleAccountChange.bind(this);
@@ -17,12 +18,11 @@ class AccountsMain extends Component {
 	
 	componentDidMount() {
 		// Break this into it's own function
-		let user_id = this.state.user_id;
-		fetch("http://localhost:8080/api/getAccounts?user_id=" + user_id, {
-				method: "GET",
-			})
-			.then(response => response.json())
-			.then(data => this.setState({ accounts: data }));
+		let user_id = this.props.user_id;
+		axios.get("http://localhost:8080/api/getAccounts?user_id=" + user_id)
+			.then(response => response.data)
+			.then(data => this.setState({ accounts: data }))
+			.catch(error => console.log(error));
 	}
 	
 	handleNewAccount(event) {
@@ -30,26 +30,25 @@ class AccountsMain extends Component {
         let accounts = this.state.accounts;
         let name = this.state.name;
         let description = this.state.description;
-		let user_id = this.state.user_id;
+		let user_id = this.props.user_id;
 		
 		// This is not sending data
-		fetch("http://localhost:8080/api/postAccount", {
-				method: "POST",
-				body: {
-					user_id: user_id,
-					account_name: name,
-					account_description: description
-				},
+		axios.post("http://localhost:8080/api/postAccount", {
+				user_id: user_id,
+				account_name: name,
+				account_description: description
 			})
-			.then(response => response.json())
-			.then(data => this.setState({ }));
-			
-		// TEMPORARY
-		fetch("http://localhost:8080/api/getAccounts?user_id=" + user_id, {
-				method: "GET",
+			.then(response => response.data)
+			.then((data) => {
+				let new_id = data[0]["@last_account_id"];
+				let accounts = this.state.accounts;
+				let newAccount = {"account_id": new_id, "name": name, "description": description, "total": 0};
+				accounts.push(newAccount);
+				this.setState({accounts: accounts, name: "", description: ""});
 			})
-			.then(response => response.json())
-			.then(data => this.setState({ accounts: data }));
+			.catch((error) => {
+				console.log(error);
+			})
     }
 	
 	handleAccountChange(key) {
@@ -72,7 +71,8 @@ class AccountsMain extends Component {
 						return (
 							<tr key={accountsData.account_id}>
 								<td><Link to={`/accounts/${accountsData.account_id}`}>{accountsData.name}</Link></td>
-								<td>{accountsData.balance}</td>
+								<td>{accountsData.description}</td>
+								<td>${accountsData.total}</td>
 							</tr>
 						)
 					})}

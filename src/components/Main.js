@@ -6,16 +6,16 @@ import Home from "./Home";
 import AccountsRouter from "./accounts/AccountsRouter";
 
 class Main extends Component {
-	constructor() {
-		super()
+	constructor(props) {
+		super(props);
 	}
 	
 	render() {
 		return (
 			<main>
 				<Switch>
-					<Route exact path='/' component={Home}/>
-					<Route path='/accounts' component={AccountsRouter}/>
+					<Route exact path='/' component={Home} />
+					<Route path='/accounts' render={(props) => <AccountsRouter {...props} user_id={this.props.user_id} />} />
 				</Switch>
 			</main>
 		);

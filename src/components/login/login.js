@@ -2,12 +2,12 @@ import React, { Component } from "react";
 //import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 //import "./Login.css";
 
-export default class Login extends Component {
+// Need to handle
+class Login extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			username: "",
 			email: "",
 			password: ""
 		};
@@ -42,3 +42,4 @@ export default class Login extends Component {
 	}
 	
 }
+export default hot(module)(Login);

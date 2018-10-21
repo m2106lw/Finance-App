@@ -16,8 +16,8 @@ class AccountsRouter extends Component {
 		return (
 			<main>
 				<Switch>
-					<Route exact path='/accounts' component={AccountsMain}/>
-					<Route path='/accounts/:id' component={Account}/>
+					<Route exact path='/accounts' render={(props) => <AccountsMain {...props} user_id={this.props.user_id} />} />
+					<Route path='/accounts/:id' render={(props) => <Account {...props} user_id={this.props.user_id} />} />
 				</Switch>
 			</main>
 		);

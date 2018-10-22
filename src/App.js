@@ -1,27 +1,44 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
+import { Switch, Route } from 'react-router-dom';
 import "./App.css";
 
-import Main from "./components/main";
 import Header from "./components/Header";
+import Home from "./components/Home";
+import AccountsRouter from "./components/accounts/AccountsRouter";
+import Login from "./components/login/Login";
 
 class App extends Component {
 	constructor() {
 		super();
 		// This should change in the future
 		this.state = {
-			user_id: 1
+			user_id: 1,
+			authenticated: false,
+			auth_token: ""
 		}
+		this.handleAuthSucceed = this.handleAuthSucceed.bind(this);
+	}
+	
+	// I believe this to be causing a rerender unfortunately 
+	handleAuthSucceed(auth_token) {
+		this.setState({user_id: 1, authenticated: true, auth_token: auth_token});
 	}
 	
 	render(){
 		return(
 			<div className="main-grid">
 				<div className="main-header"><Header /></div>
-				<div className="main-body"><Main user_id={this.state.user_id}/></div>
+				<div className="main-body">
+				<Switch>
+					<Route exact path='/' component={Home}/>
+					<Route exact path='/home' component={Home} />
+					<Route path="/login" render={(props) => <Login {...props} onAuthSucceed={this.handleAuthSucceed} />} />
+					<Route path='/accounts' render={(props) => <AccountsRouter {...props} user_id={this.state.user_id} />} />
+					<Route render={() => (<div> Sorry, this page does not exist. </div>)} />
+				</Switch></div>
 			</div>
 		);
 	}
 }
-
 export default hot(module)(App);

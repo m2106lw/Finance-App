@@ -1,22 +1,21 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
-import { Switch, Route } from 'react-router-dom';
+import { Redirect, Route } from 'react-router-dom';
 
 import Login from "./Login";
-import AccountsRouter from "./accounts/AccountsRouter";
 
 class LoginRouter extends Component {
-	constructor() {
-		super()
+	constructor(props) {
+		super(props)
 	}
 	
 	render() {
 		return (
-			<main>
-				<Switch>
-					<Route exact path='/login' component={Login}/>
-				</Switch>
-			</main>
+			<Route {...rest} render={(props) => (
+				AuthService.isAuthenticated === true
+				? <Component {...props} />
+				: <Redirect to='/login' />
+			)} />
 		);
 	}
 }

@@ -1,42 +1,49 @@
 import React, { Component } from "react";
-//import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
-//import "./Login.css";
+import {hot} from "react-hot-loader";
 
 // Need to handle
 class Login extends Component {
 	constructor(props) {
 		super(props);
-
 		this.state = {
 			email: "",
-			password: ""
-		};
+			password: "",
+			error: false
+		}
+		this.handleLogin = this.handleLogin.bind(this);
+		this.handleLoginTextChange = this.handleLoginTextChange.bind(this);
 	}
-	
-	validateForm() {
-		return this.state.username.length > 0 && this.state.password.length > 0;
+  
+	handleLogin(event) {
+		event.preventDefault();
+		if (this.state.email != "" && this.state.password != "") {
+			this.props.onAuthSucceed("token");
+		}
+		else {
+			this.setState({error: true});
+		}
 	}
-	
-	handleClick(event){
-		console.log(this.state.username);
+  
+	handleLoginTextChange(key) {
+		return function (e) {
+			var state = {};
+			state[key] = e.target.value;
+			this.setState(state);
+		}.bind(this);	
 	}
 	
 	render() {
 		return (
 			<div>
-				<TextField 
-					hintText="Enter your Username" floatingLabelText="Username"
-					onChange = {(event, newValue) =>
-						this.setState({username: newValue})}
-				/>
-				<br/>
-				<TextField 
-					hintText="Enter your Password" floatingLabelText="Password"
-					onChange = {(event, newValue) =>
-					this.setState({username: newValue})}
-				/>
-				<br/>
-				<button label="Submit" primary={true} onClick={(event) => this.handleClick(event)}/>
+			<form onSubmit={this.handleLogin}>
+	            <label> Name:
+                    <input type="text" name="email" placeholder="Email" value={this.state.email} onChange={this.handleLoginTextChange('email')} />
+                </label>
+                <label> Password: 
+					<input type="text" name="password" placeholder="Password" value={this.state.password} onChange={this.handleLoginTextChange('password')} />
+                </label>
+					<input className="loginButton" type="submit" value="Login"/>		
+			</form>
 			</div>					
 		);
 	}

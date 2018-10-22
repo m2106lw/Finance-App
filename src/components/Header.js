@@ -9,6 +9,8 @@ class Header extends Component {
 		super();
 	}
 	
+	// Should probably make this a grid instead of table
+	// I'd also like to add profile info at top, but that will probably be another component in App.js
 	render () {
 		return (
 			<header>

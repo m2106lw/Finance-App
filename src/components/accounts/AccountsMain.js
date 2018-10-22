@@ -62,7 +62,7 @@ class AccountsMain extends Component {
 	// Look into making each link take you to the accounts main page
 	// <Link to={'/accounts/accountsData.id'}>
 	render(){
-		let accounts = this.state.accounts
+		let accounts = this.state.accounts;
 		return(
 			<div className="accountsPage">
 			<table>

@@ -36,11 +36,12 @@ class AccountsMain extends Component {
 		axios.post("http://localhost:8080/api/postAccount", {
 				user_id: user_id,
 				account_name: name,
-				account_description: description
+				account_description: description,
+				account_id: 0
 			})
 			.then(response => response.data)
 			.then((data) => {
-				let new_id = data[0]["@last_account_id"];
+				let new_id = data[0]["new_account_id"];
 				let accounts = this.state.accounts;
 				let newAccount = {"account_id": new_id, "name": name, "description": description, "total": 0};
 				accounts.push(newAccount);
@@ -66,13 +67,20 @@ class AccountsMain extends Component {
 		return(
 			<div className="accountsPage">
 			<table>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Description</th>
+						<th>Current Balance</th>
+					</tr>
+				</thead>
 				<tbody>
 					{accounts.map((accountsData) => {
 						return (
 							<tr key={accountsData.account_id}>
 								<td><Link to={`/accounts/${accountsData.account_id}`}>{accountsData.name}</Link></td>
 								<td>{accountsData.description}</td>
-								<td>${accountsData.total}</td>
+								<td>${accountsData.balance}</td>
 							</tr>
 						)
 					})}

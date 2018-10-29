@@ -1,12 +1,13 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Link } from 'react-router-dom';
 import "./App.css";
 
 import Header from "./components/Header";
 import Home from "./components/Home";
 import AccountsRouter from "./components/accounts/AccountsRouter";
 import Login from "./components/login/Login";
+import TransactionsRouter from "./components/transactions/TransactionsRouter";
 
 class App extends Component {
 	constructor() {
@@ -14,7 +15,7 @@ class App extends Component {
 		// This should change in the future
 		this.state = {
 			user_id: 1,
-			authenticated: false,
+			isAuthenticated: false,
 			auth_token: ""
 		}
 		this.handleAuthSucceed = this.handleAuthSucceed.bind(this);
@@ -22,9 +23,10 @@ class App extends Component {
 	
 	// I believe this to be causing a rerender unfortunately 
 	handleAuthSucceed(auth_token) {
-		this.setState({user_id: 1, authenticated: true, auth_token: auth_token});
+		this.setState({user_id: 1, isAuthenticated: true, auth_token: auth_token});
 	}
 	
+	//<Link to='/login'>Login</Link>
 	render(){
 		return(
 			<div className="main-grid">
@@ -33,8 +35,9 @@ class App extends Component {
 				<Switch>
 					<Route exact path='/' component={Home}/>
 					<Route exact path='/home' component={Home} />
-					<Route path="/login" render={(props) => <Login {...props} onAuthSucceed={this.handleAuthSucceed} />} />
-					<Route path='/accounts' render={(props) => <AccountsRouter {...props} user_id={this.state.user_id} />} />
+					<Route path="/login" render={(props) => <Login {...props} onAuthSucceed={this.handleAuthSucceed} isAuthenticated={this.state.isAuthenticated}  />} />
+					<Route path='/accounts' render={(props) => <AccountsRouter {...props} user_id={this.state.user_id} isAuthenticated={this.state.isAuthenticated} />} />
+					<Route path='/transactions' render={(props) => <TransactionsRouter {...props} user_id={this.state.user_id} isAuthenticated={this.state.isAuthenticated} />} />
 					<Route render={() => (<div> Sorry, this page does not exist. </div>)} />
 				</Switch></div>
 			</div>

@@ -15,7 +15,9 @@ class AccountBalances extends Component {
 		let account_id = this.props.account_id;
 		axios.get("http://localhost:8080/api/getAccountBalances?account_id=" + account_id)
 			.then(response => response.data)
-			.then(data => this.setState({ balances: data }))
+			.then(data => {
+				this.setState({ balances: data })
+			})
 			.catch(error => console.log(error));
 	}
 	
@@ -27,10 +29,16 @@ class AccountBalances extends Component {
 		return(
 			<div className="accountBalances">
 				<table>
+					<thead>
+						<tr>
+							<th>Balance</th>
+							<th>Date</th>
+						</tr>
+					</thead>
 					<tbody>
-						{balances.map((balancesData) => {
+						{balances.map((balancesData, index) => {
 							return (
-								<tr key={balancesData.balance_id}>
+								<tr key={index}>
 									<td>${balancesData.balance}</td>
 									<td>{moment(balancesData.date).format('MM/DD/YYYY')}</td>
 								</tr>

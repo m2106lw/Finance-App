@@ -15,7 +15,7 @@ class Account extends Component {
 	componentDidMount() {
 		let user_id = this.props.user_id
 		let account_id = this.props.match.params.id;
-		axios.get("http://localhost:8080/api/getAccountById?account_id=" + account_id)
+		axios.get("http://localhost:8080/api/getAccount?account_id=" + account_id)
 			.then(response => response.data)
 			.then(data => this.setState({ account: data[0] }))
 			.catch(error => console.log(error));
@@ -27,7 +27,8 @@ class Account extends Component {
 	render(){
 		return(
 			<div className="accountsPage">
-				<p>{this.state.account.name}   ${this.state.account.total}</p>
+				<p>{this.state.account.name}</p>
+				<p>Current Balance: ${this.state.account.balance}</p>
 				<p>{this.state.account.description}</p>
 				<AccountBalances account_id={this.props.match.params.id}/>
 			</div>

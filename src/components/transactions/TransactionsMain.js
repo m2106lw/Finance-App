@@ -22,15 +22,17 @@ class TransactionsMain extends Component {
 			error: false,
 			selectedYear: (new Date()).getFullYear(),
 			selectedMonth: (new Date()).getMonth(),
-			typeSelected: -1
+			typeSelected: -1,
+			isLoading: true
 		}
 		this.filterTransactions = this.filterTransactions.bind(this);
-		//this.capitalizeFirstLetter = this.capitalizeFirstLetter.bind(this);
 		this.handleTypeSelection = this.handleTypeSelection.bind(this);
 		this.handleYearSelection = this.handleYearSelection.bind(this);
 		this.handleMonthSelection = this.handleMonthSelection.bind(this);
+		this.handleTransactionChange = this.handleTransactionChange.bind(this);
 	}
 	
+	// Need to work on updating differnet so there aren't three seperate renders
 	componentDidMount() {
 		// Break this into it's own function
 		let user_id = this.props.user_id;
@@ -62,6 +64,7 @@ class TransactionsMain extends Component {
 				this.setState({transactionYears: transactionYears})
 			})
 			.catch(error => console.log(error));
+		this.setState({isLoading: false});
 	}
 	
 	// This function will check our transaction against the user selected values and return the right filter
@@ -76,23 +79,34 @@ class TransactionsMain extends Component {
 		return type && year && month;
 	};
 	
-	handleTypeSelection(typeId) {
-		
+	handleTypeSelection(typeId) {		
 		this.setState({typeSelected: typeId});
 	}
-	handleYearSelection(year) {
-		
+	handleYearSelection(year) {		
 		this.setState({selectedYear: year});
 	}
-	handleMonthSelection(month) {
-		
+	handleMonthSelection(month) {		
 		this.setState({selectedMonth: month});
+	}
+	
+	// Not sure I wanna do this since it causes a rerender each time
+	// Need to figure out if that is the best way
+	handleTransactionChange(id, key, value) {
+		let transactions = this.state.transactions;
+		let index = transactions.findIndex((transaction) => {
+			return transaction["transaction_id"] == id;
+		});
+		transactions[index][key] = value;
+		this.setState({transactions: transactions})
 	}
 	
 	// https://github.com/JedWatson/react-select for drop down menus - split into it's own component and pass up transaction_type_id
 	// Design: Have Main hold transactions. Have filter component, display transactions component, and insert new transaction component
 	//  	   Main will pass display info based filters recieved, but always holds all the info
 	render(){
+		if (this.state.isLoading) {
+			return (<p>Loading...</p>);
+		}
 		let transactions = this.state.transactions;
 		let transactionTypes = this.state.transactionTypes;
 		let filteredTransactions = transactions.filter(this.filterTransactions);
@@ -102,7 +116,7 @@ class TransactionsMain extends Component {
 				<GenericSelect passSelection={this.handleTypeSelection} selectArray={this.state.transactionTypes} defaultValue={this.state.typeSelected}/>
 				<GenericSelect passSelection={this.handleYearSelection} selectArray={this.state.transactionYears} defaultValue={this.state.selectedYear}/>
 				<GenericSelect passSelection={this.handleMonthSelection} selectArray={this.state.transactionMonths} defaultValue={this.state.selectedMonth}/>
-				<TransactionTable filteredTransactions={filteredTransactions}/>
+				<TransactionTable filteredTransactions={filteredTransactions} handleTransactionChange={this.handleTransactionChange} transactionTypes={this.state.transactionTypes}/>
 			</div>
 		);
 	}

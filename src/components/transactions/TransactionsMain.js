@@ -17,11 +17,10 @@ class TransactionsMain extends Component {
 			transactionTypes: [],
 			transactionYears: [],
 			transactionMonths: months,
-			name: "",
-			description: "",
-			error: false,
+			accounts: [],
 			selectedYear: (new Date()).getFullYear(),
 			selectedMonth: (new Date()).getMonth(),
+			selectedAccount: -1,
 			typeSelected: -1,
 			isLoading: true
 		}
@@ -29,7 +28,10 @@ class TransactionsMain extends Component {
 		this.handleTypeSelection = this.handleTypeSelection.bind(this);
 		this.handleYearSelection = this.handleYearSelection.bind(this);
 		this.handleMonthSelection = this.handleMonthSelection.bind(this);
+		this.handleAccountSelection = this.handleAccountSelection.bind(this);
 		this.handleTransactionChange = this.handleTransactionChange.bind(this);
+		this.onDelete = this.onDelete.bind(this);
+		this.onSave = this.onSave.bind(this);
 	}
 	
 	// Need to work on updating differnet so there aren't three seperate renders
@@ -64,6 +66,17 @@ class TransactionsMain extends Component {
 				this.setState({transactionYears: transactionYears})
 			})
 			.catch(error => console.log(error));
+			
+		axios.get("http://localhost:8080/api/getAccounts?user_id=" + user_id)
+			.then(response => response.data)
+			.then(data => {
+				let accounts = data.map((account) => {
+					return {"value": account.account_id, "name": account.name};
+				});
+				accounts.unshift({"value": -1, "name": "All"});
+				this.setState({accounts: accounts})
+			})
+			.catch(error => console.log(error));
 		this.setState({isLoading: false});
 	}
 	
@@ -76,7 +89,10 @@ class TransactionsMain extends Component {
 		
 		if (this.state.selectedMonth != -1) {var month = ((moment(transaction.date).month()) == this.state.selectedMonth);}
 		else {var month = true;}
-		return type && year && month;
+		
+		if (this.state.selectedAccount != -1) {var account = (transaction.account_id == this.state.selectedAccount);}
+		else {var account = true;}
+		return type && year && month && account;
 	};
 	
 	handleTypeSelection(typeId) {		
@@ -87,6 +103,24 @@ class TransactionsMain extends Component {
 	}
 	handleMonthSelection(month) {		
 		this.setState({selectedMonth: month});
+	}
+	handleAccountSelection(account_id) {
+		console.log(account_id);		
+		this.setState({selectedAccount: account_id});
+	}
+	
+	onDelete(transaction_id) {
+		let transactions = this.state.transactions;
+		let index = transactions.findIndex((transaction) => {
+			return transaction["transaction_id"] == transaction_id;
+		});
+		transactions.splice(index, 1);
+		this.setState({transactions: transactions})
+	}
+
+	onSave(transaction_id) {
+		console.log("Saving...");
+		console.log("Done");
 	}
 	
 	// Not sure I wanna do this since it causes a rerender each time
@@ -111,12 +145,21 @@ class TransactionsMain extends Component {
 		let transactionTypes = this.state.transactionTypes;
 		let filteredTransactions = transactions.filter(this.filterTransactions);
 		// Will need a field to handle new transactions
+		// Look into having TransactionTable handle the filtering
 		return(
 			<div className="transactionsPage">
 				<GenericSelect passSelection={this.handleTypeSelection} selectArray={this.state.transactionTypes} defaultValue={this.state.typeSelected}/>
 				<GenericSelect passSelection={this.handleYearSelection} selectArray={this.state.transactionYears} defaultValue={this.state.selectedYear}/>
 				<GenericSelect passSelection={this.handleMonthSelection} selectArray={this.state.transactionMonths} defaultValue={this.state.selectedMonth}/>
-				<TransactionTable filteredTransactions={filteredTransactions} handleTransactionChange={this.handleTransactionChange} transactionTypes={this.state.transactionTypes}/>
+				<GenericSelect passSelection={this.handleAccountSelection} selectArray={this.state.accounts} defaultValue={this.state.selectedAccount}/>
+				<TransactionTable 
+					filteredTransactions={filteredTransactions} 
+					handleTransactionChange={this.handleTransactionChange} 
+					transactionTypes={this.state.transactionTypes} 
+					accounts={this.state.accounts}
+					onDelete={this.onDelete}
+					onSave={this.onSave}
+				/>
 			</div>
 		);
 	}

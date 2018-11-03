@@ -5,7 +5,6 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 
 import { capitalizeFirstLetter } from '../functions';
-// Test
 import GenericSelect from '../GenericSelect';
 
 class TransactionTable extends Component {
@@ -15,18 +14,24 @@ class TransactionTable extends Component {
 		this.renderEditable = this.renderEditable.bind(this);
 		this.handleTypeSelection = this.handleTypeSelection.bind(this);
 	}
-				
-	// updateTransaction(cellInfo) {
-		// let id = cellInfo.original.transaction_id;
-		// let key = cellInfo.column.id;
-		// let value = cellInfo.value
-		// this.props.handleTransactionChange(id, key, value);
-	// }
-	handleTypeSelection(typeId) {		
-		console.log(typeId);
+
+	// Might be able to just set these to this.props.handleTransactionChange
+	// Special handler for the type selection
+	handleTypeSelection(id, event) {
+		let key = "transaction_type_id";
+		let value = event.target.value;
+		this.props.handleTransactionChange(id, key, value);
+	}
+	
+	// Special handler for the type selection
+	handleAccountSelection(id, event) {
+		let key = "account_id";
+		let value = event.target.value;
+		this.props.handleTransactionChange(id, key, value);
 	}
 	
 	// Honestly not entirely sure what this does, but it's working for now
+	// Might not need to push to parent until saving
 	renderEditable(cellInfo) {
 		return (
 			<div
@@ -36,7 +41,7 @@ class TransactionTable extends Component {
 				onBlur={e => {
 					let id = cellInfo.original.transaction_id;
 					let key = cellInfo.column.id;
-					let value = cellInfo.value;
+					let value = e.target.innerHTML
 					this.props.handleTransactionChange(id, key, value);
 				}}
 				dangerouslySetInnerHTML={{
@@ -55,13 +60,15 @@ class TransactionTable extends Component {
 		let transactionTypes = this.props.transactionTypes.filter((type) => {
 			return type.value != -1;
 		})
+		let accounts = this.props.accounts.filter((account) => {
+			return account.value != -1;
+		})
 		//console.log(transactionTypes)
 		return (
 			<ReactTable
 				data={transactions}
 				columns={[
 					{
-						// Update not working
 						Header: "Description",
 						id: "description",
 						accessor: transaction => transaction.description,
@@ -74,15 +81,59 @@ class TransactionTable extends Component {
 						Cell: this.renderEditable
 					},
 					{
+						// Need to figure out how to do a calender here
+						// might use https://www.npmjs.com/package/react-calendar or https://www.npmjs.com/package/react-moment
 						Header: "Date",
 						id: "date",
 						accessor: transaction => moment(transaction.date).format('MM/DD/YYYY'),
 					},
 					{
+						// Bug with showing the right account selected - state may not be getting changed?
+						// Bug with selects => won't display the right selection. Need to check cellInfo
+						// Need to figure out how to best match the style of the rest of the table
 						Header: "Type",
 						id: "type",
 						accessor: transaction => capitalizeFirstLetter(transaction.transaction_type_name),
-						Cell: cellInfo => <GenericSelect passSelection={this.handleTypeSelection} selectArray={transactionTypes} defaultValue={cellInfo.original.transaction_type_id}/>
+						Cell: cellInfo => {
+							return (
+							<select className={cellInfo.row.id} onChange={e => this.handleTypeSelection(cellInfo.original.transaction_id, e)} value={cellInfo.row.transaction_type_id}>
+								{transactionTypes.map((value, index) => {
+									return (
+										<option key={index} value={value.value}>{value.name}</option>
+									)
+								})}
+							</select>
+							)
+						}
+					},
+					{
+						// Need to figure out how to best match the style of the rest of the table
+						Header: "Account",
+						id: "account",
+						accessor: transaction => transaction.account_name,
+						Cell: cellInfo => {
+							return (
+							<select className={cellInfo.row.id} onChange={e => this.handleAccountSelection(cellInfo.original.transaction_id, e)} value={cellInfo.row.account_id}>
+								{accounts.map((value, index) => {
+									return (
+										<option key={index} value={value.value}>{value.name}</option>
+									)
+								})}
+							</select>
+							)
+						}
+					},
+					{
+						Header: "Options",
+						id: "options",
+						Cell: cellInfo => {
+							return (
+								<div>
+									<button onClick={e => this.props.onSave(cellInfo.original.transaction_id)}>Save</button>
+									<button onClick={e => this.props.onDelete(cellInfo.original.transaction_id)}>Delete</button>
+								</div>
+							)
+						}
 					},
 				]}
 				defaultPageSize={10}

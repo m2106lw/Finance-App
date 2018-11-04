@@ -104,11 +104,11 @@ class TransactionsMain extends Component {
 	handleMonthSelection(month) {		
 		this.setState({selectedMonth: month});
 	}
-	handleAccountSelection(account_id) {
-		console.log(account_id);		
+	handleAccountSelection(account_id) {		
 		this.setState({selectedAccount: account_id});
 	}
 	
+	// Maybe look through here and check on the year to see if we need to delete it from selection
 	onDelete(transaction_id) {
 		let transactions = this.state.transactions;
 		let index = transactions.findIndex((transaction) => {
@@ -118,20 +118,32 @@ class TransactionsMain extends Component {
 		this.setState({transactions: transactions})
 	}
 
+	// Work on API for saving
 	onSave(transaction_id) {
 		console.log("Saving...");
 		console.log("Done");
 	}
 	
-	// Not sure I wanna do this since it causes a rerender each time
-	// Need to figure out if that is the best way
+	// Need to figure out how to handle errors for the inputs
 	handleTransactionChange(id, key, value) {
 		let transactions = this.state.transactions;
 		let index = transactions.findIndex((transaction) => {
 			return transaction["transaction_id"] == id;
 		});
 		transactions[index][key] = value;
-		this.setState({transactions: transactions})
+		
+		console.log(transactions[index]);
+		// So far this does not work, it just adds the previous years
+		// Need to also be able to handle coversion to and from utc
+		if (key == "date" && !this.state.transactionYears.some(year => year.name === moment(value).year())) {
+			console.log(moment(value).format("YYYY-MM-DDThh:mm:ssZ"));
+			let transactionYears = this.state.transactionYears;
+			transactionYears.push({"value": moment(value).year(), "name": moment(value).year()})
+			this.setState({transactions: transactions, transactionYears: transactionYears})
+		}
+		else {
+			this.setState({transactions: transactions})
+		}
 	}
 	
 	// https://github.com/JedWatson/react-select for drop down menus - split into it's own component and pass up transaction_type_id

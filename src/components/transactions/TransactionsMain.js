@@ -3,9 +3,10 @@ import {hot} from "react-hot-loader";
 //import { Link } from 'react-router-dom';
 const axios = require('axios');
 const moment = require('moment');
+import Select from 'react-select';
 
 import TransactionTable from './TransactionTable';
-import GenericSelect from '../GenericSelect';
+import TransactionAdd from './TransactionAdd';
 import { months } from '../templates';
 import { capitalizeFirstLetter } from '../functions';
 
@@ -19,19 +20,14 @@ class TransactionsMain extends Component {
 			transactionMonths: months,
 			accounts: [],
 			selectedYear: (new Date()).getFullYear(),
-			selectedMonth: (new Date()).getMonth(),
-			selectedAccount: -1,
-			typeSelected: -1,
 			isLoading: true
 		}
-		this.filterTransactions = this.filterTransactions.bind(this);
-		this.handleTypeSelection = this.handleTypeSelection.bind(this);
 		this.handleYearSelection = this.handleYearSelection.bind(this);
-		this.handleMonthSelection = this.handleMonthSelection.bind(this);
-		this.handleAccountSelection = this.handleAccountSelection.bind(this);
 		this.handleTransactionChange = this.handleTransactionChange.bind(this);
 		this.onDelete = this.onDelete.bind(this);
 		this.onSave = this.onSave.bind(this);
+		this.addTransaction = this.addTransaction.bind(this);
+		this.checkForYear = this.checkForYear.bind(this);
 	}
 	
 	// Need to work on updating differnet so there aren't three seperate renders
@@ -47,21 +43,19 @@ class TransactionsMain extends Component {
 		axios.get("http://localhost:8080/api/getTransactionTypes")
 			.then(response => response.data)
 			.then(data => {
-				let transactionTypes = data.map((type) => {
-					return {"value": type.transaction_type_id, "name": capitalizeFirstLetter(type.name)};
-				});
-				transactionTypes.unshift({"value": -1, "name": "Any"});
-				this.setState({transactionTypes: transactionTypes})
-			})			
+				data.unshift({"transaction_type_id": -1, "name": "any"});
+				this.setState({transactionTypes: data});			
+			})
 			.catch(error => console.log(error));
 
+		// Need to clean this one up some
 		axios.get("http://localhost:8080/api/getTransactionsYears?user_id=" + user_id)
 			.then(response => response.data)
 			.then(data => {
 				let yearFound = data.find(year => year.year === this.state.selectedYear);
 				if(yearFound === undefined) {data.unshift({year: this.state.selectedYear})};
 				let transactionYears = data.map((year) => {
-					return {"value": year.year, "name": year.year}
+					return {"value": year.year, "label": year.year}
 				})
 				this.setState({transactionYears: transactionYears})
 			})
@@ -70,42 +64,35 @@ class TransactionsMain extends Component {
 		axios.get("http://localhost:8080/api/getAccounts?user_id=" + user_id)
 			.then(response => response.data)
 			.then(data => {
-				let accounts = data.map((account) => {
-					return {"value": account.account_id, "name": account.name};
-				});
-				accounts.unshift({"value": -1, "name": "All"});
-				this.setState({accounts: accounts})
+				data.unshift({"account_id": -1, "name": "Any"});
+				this.setState({accounts: data})
 			})
 			.catch(error => console.log(error));
 		this.setState({isLoading: false});
 	}
 	
 	// This function will check our transaction against the user selected values and return the right filter
-	filterTransactions(transaction) {
-		if (this.state.typeSelected != -1) {var type = (transaction.transaction_type_id == this.state.typeSelected);}
-		else {var type = true;}
+	// filterTransactions(transaction) {
+		// if (this.state.typeSelected != -1) {var type = (transaction.transaction_type_id == this.state.typeSelected);}
+		// else {var type = true;}
 		
-		var year = (moment(transaction.date).year() == this.state.selectedYear);
+		// var year = (moment(transaction.date).year() == this.state.selectedYear);
 		
-		if (this.state.selectedMonth != -1) {var month = ((moment(transaction.date).month()) == this.state.selectedMonth);}
-		else {var month = true;}
+		// if (this.state.selectedMonth != -1) {var month = ((moment(transaction.date).month()) == this.state.selectedMonth);}
+		// else {var month = true;}
 		
-		if (this.state.selectedAccount != -1) {var account = (transaction.account_id == this.state.selectedAccount);}
-		else {var account = true;}
-		return type && year && month && account;
-	};
+		// if (this.state.selectedAccount != -1) {var account = (transaction.account_id == this.state.selectedAccount);}
+		// else {var account = true;}
+		// return type && year && month && account;
+	// };
 	
-	handleTypeSelection(typeId) {		
-		this.setState({typeSelected: typeId});
-	}
-	handleYearSelection(year) {		
+	handleYearSelection(year) {
+		// We will need to load transactions for the selected year's data
 		this.setState({selectedYear: year});
 	}
-	handleMonthSelection(month) {		
-		this.setState({selectedMonth: month});
-	}
-	handleAccountSelection(account_id) {		
-		this.setState({selectedAccount: account_id});
+	
+	checkForYear(value) {
+		return this.state.transactionYears.some(year => year.label === moment(value).year());
 	}
 	
 	// Maybe look through here and check on the year to see if we need to delete it from selection
@@ -124,7 +111,35 @@ class TransactionsMain extends Component {
 		console.log("Done");
 	}
 	
+	// IDEA: Make this more reuasable, so for both new and existing transactions
+	// Might need to return a success or not
+	addTransaction(transaction) {
+		// Make axios call for insertion here, we need to wait for it so that we can get a actual transaction_id		
+		console.log(transaction);
+		let transaction_id = axios.post("http://localhost:8080/api/postTransaction", {
+				transaction: transaction
+			})
+			.then(response => response.data)
+			.then(data => {
+				return data
+			})
+			.catch(error => console.log(error));
+			
+		if (!this.checkForYear(transaction.date)) {
+			let transactionYears = this.state.transactionYears;
+			transactionYears.push({"value": moment(transaction.date).year(), "label": moment(transaction.date).year()})
+			this.setState({transactionYears: transactionYears})
+		}
+		else {
+			let transactions = this.state.transactions;
+			transactions.push(transaction);	
+			this.setState({transactions: transactions});
+		}
+	}
+	
 	// Need to figure out how to handle errors for the inputs
+	// Don't handle the new years being added here, only when saved
+	// Then we can remove them from the current transaction list, preferably above
 	handleTransactionChange(id, key, value) {
 		let transactions = this.state.transactions;
 		let index = transactions.findIndex((transaction) => {
@@ -132,48 +147,57 @@ class TransactionsMain extends Component {
 		});
 		transactions[index][key] = value;
 		
+		// Might need to do a search for the right transaction type name
+		// Might need to do a search for the right account name
+		
 		console.log(transactions[index]);
 		// So far this does not work, it just adds the previous years
 		// Need to also be able to handle coversion to and from utc
-		if (key == "date" && !this.state.transactionYears.some(year => year.name === moment(value).year())) {
-			console.log(moment(value).format("YYYY-MM-DDThh:mm:ssZ"));
+		if (key == "date" && !this.checkForYear(value)) {
 			let transactionYears = this.state.transactionYears;
-			transactionYears.push({"value": moment(value).year(), "name": moment(value).year()})
-			this.setState({transactions: transactions, transactionYears: transactionYears})
+			transactionYears.push({"value": moment(value).year(), "label": moment(value).year()})
+			this.setState({transactionYears: transactionYears})
 		}
 		else {
 			this.setState({transactions: transactions})
 		}
 	}
 	
-	// https://github.com/JedWatson/react-select for drop down menus - split into it's own component and pass up transaction_type_id
 	// Design: Have Main hold transactions. Have filter component, display transactions component, and insert new transaction component
 	//  	   Main will pass display info based filters recieved, but always holds all the info
 	render(){
 		if (this.state.isLoading) {
 			return (<p>Loading...</p>);
 		}
-		let transactions = this.state.transactions;
+		let transactions = this.state.transactions || [];
 		let transactionTypes = this.state.transactionTypes;
-		let filteredTransactions = transactions.filter(this.filterTransactions);
-		// Will need a field to handle new transactions
+		let transactionYears = this.state.transactionYears;
+		console.log(transactionYears);
+
 		// Look into having TransactionTable handle the filtering
 		return(
 			<div className="transactionsPage">
-				<GenericSelect passSelection={this.handleTypeSelection} selectArray={this.state.transactionTypes} defaultValue={this.state.typeSelected}/>
-				<GenericSelect passSelection={this.handleYearSelection} selectArray={this.state.transactionYears} defaultValue={this.state.selectedYear}/>
-				<GenericSelect passSelection={this.handleMonthSelection} selectArray={this.state.transactionMonths} defaultValue={this.state.selectedMonth}/>
-				<GenericSelect passSelection={this.handleAccountSelection} selectArray={this.state.accounts} defaultValue={this.state.selectedAccount}/>
-				<TransactionTable 
-					filteredTransactions={filteredTransactions} 
-					handleTransactionChange={this.handleTransactionChange} 
-					transactionTypes={this.state.transactionTypes} 
-					accounts={this.state.accounts}
-					onDelete={this.onDelete}
-					onSave={this.onSave}
-				/>
+				<div style={{ width: "40%" }}>
+					<Select onChange={e => this.handleYearSelection} options={transactionYears}/>
+				</div>
+				<div>
+					<TransactionTable 
+						transactions={transactions} 
+						handleTransactionChange={this.handleTransactionChange} 
+						transactionTypes={this.state.transactionTypes} 
+						accounts={this.state.accounts}
+						onDelete={this.onDelete}
+						onSave={this.onSave}
+					/>
+				</div>
+				<br/>
+				<TransactionAdd transactionTypes={this.state.transactionTypes} accounts={this.state.accounts} addTransaction={this.addTransaction}/>
 			</div>
 		);
+				// <GenericSelect passSelection={this.handleTypeSelection} selectArray={this.state.transactionTypes} defaultValue={this.state.typeSelected}/>
+				// <GenericSelect passSelection={this.handleYearSelection} selectArray={this.state.transactionYears} defaultValue={this.state.selectedYear}/>
+				// <GenericSelect passSelection={this.handleMonthSelection} selectArray={this.state.transactionMonths} defaultValue={this.state.selectedMonth}/>
+				// <GenericSelect passSelection={this.handleAccountSelection} selectArray={this.state.accounts} defaultValue={this.state.selectedAccount}/>
 	}
 }
 export default hot(module)(TransactionsMain);

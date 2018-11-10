@@ -11,6 +11,8 @@
   "author": "Matthew Williams",
   "license": "ISC",
   "dependencies": {
+    "ag-grid-community": "^19.1.2",
+    "ag-grid-react": "^19.1.2",
     "axios": "^0.18.0",
     "babel-loader": "^7.1.5",
     "moment": "^2.22.2",
@@ -19,6 +21,8 @@
     "react-dom": "^16.4.2",
     "react-hot-loader": "^4.3.6",
     "react-router-dom": "^4.3.1",
+    "react-select": "^2.1.1",
+    "react-table": "^6.8.6",
     "webpack": "^4.17.2"
   },
   "devDependencies": {

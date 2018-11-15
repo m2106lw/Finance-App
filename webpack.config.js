@@ -11,9 +11,9 @@ module.exports = {
         exclude: /(node_modules|bower_components)/,
         loader: 'babel-loader',
         options: { 
-			presets: ['env'],
-			plugins: ['react-hot-loader/babel']
-		}
+		      presets: ['env'],
+			    plugins: ['react-hot-loader/babel']
+		    }
       },
       {
         test: /\.css$/,

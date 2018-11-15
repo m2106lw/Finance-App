@@ -5,25 +5,30 @@
   "main": "",
   "scripts": {
     "start": "webpack-dev-server --mode development --hot",
-    "build": "webpack --mode development",
+    "build": "webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Matthew Williams",
   "license": "ISC",
   "dependencies": {
+    "@date-io/moment": "0.0.2",
+    "@material-ui/core": "^3.4.0",
+    "@material-ui/icons": "^3.0.1",
     "ag-grid-community": "^19.1.2",
     "ag-grid-react": "^19.1.2",
     "axios": "^0.18.0",
     "babel-loader": "^7.1.5",
+    "material-table": "^1.1.2",
+    "material-ui-pickers": "^2.0.1",
     "moment": "^2.22.2",
-    "react": "^16.4.2",
+    "react": "^16.6.1",
     "react-datepicker": "^1.8.0",
-    "react-dom": "^16.4.2",
-    "react-hot-loader": "^4.3.6",
+    "react-dom": "^16.6.1",
+    "react-hot-loader": "^4.4.0",
     "react-router-dom": "^4.3.1",
     "react-select": "^2.1.1",
     "react-table": "^6.8.6",
-    "webpack": "^4.17.2"
+    "webpack": "^4.25.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -31,9 +36,9 @@
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
-    "css-loader": "^1.0.0",
-    "style-loader": "^0.23.0",
-    "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.8"
+    "css-loader": "^1.0.1",
+    "style-loader": "^0.23.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10"
   }
 }

@@ -30,6 +30,8 @@ class App extends Component {
 	render(){
 		return(
 			<div className="main-grid">
+				<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
+				<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"></link>
 				<div className="main-header"><Header /></div>
 				<div className="main-body">
 				<Switch>

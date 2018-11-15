@@ -43,7 +43,7 @@ class TransactionsMain extends Component {
 		axios.get("http://localhost:8080/api/getTransactionTypes")
 			.then(response => response.data)
 			.then(data => {
-				data.unshift({"transaction_type_id": -1, "name": "any"});
+				//data.unshift({"transaction_type_id": -1, "name": "any"});
 				this.setState({transactionTypes: data});			
 			})
 			.catch(error => console.log(error));
@@ -63,28 +63,10 @@ class TransactionsMain extends Component {
 			
 		axios.get("http://localhost:8080/api/getAccounts?user_id=" + user_id)
 			.then(response => response.data)
-			.then(data => {
-				data.unshift({"account_id": -1, "name": "Any"});
-				this.setState({accounts: data})
-			})
+			.then(data => this.setState({accounts: data}))
 			.catch(error => console.log(error));
 		this.setState({isLoading: false});
 	}
-	
-	// This function will check our transaction against the user selected values and return the right filter
-	// filterTransactions(transaction) {
-		// if (this.state.typeSelected != -1) {var type = (transaction.transaction_type_id == this.state.typeSelected);}
-		// else {var type = true;}
-		
-		// var year = (moment(transaction.date).year() == this.state.selectedYear);
-		
-		// if (this.state.selectedMonth != -1) {var month = ((moment(transaction.date).month()) == this.state.selectedMonth);}
-		// else {var month = true;}
-		
-		// if (this.state.selectedAccount != -1) {var account = (transaction.account_id == this.state.selectedAccount);}
-		// else {var account = true;}
-		// return type && year && month && account;
-	// };
 	
 	handleYearSelection(year) {
 		// We will need to load transactions for the selected year's data
@@ -150,7 +132,7 @@ class TransactionsMain extends Component {
 		// Might need to do a search for the right transaction type name
 		// Might need to do a search for the right account name
 		
-		console.log(transactions[index]);
+		console.log("Change found", transactions[index]);
 		// So far this does not work, it just adds the previous years
 		// Need to also be able to handle coversion to and from utc
 		if (key == "date" && !this.checkForYear(value)) {
@@ -172,7 +154,7 @@ class TransactionsMain extends Component {
 		let transactions = this.state.transactions || [];
 		let transactionTypes = this.state.transactionTypes;
 		let transactionYears = this.state.transactionYears;
-		console.log(transactionYears);
+		//console.log(transactionYears);
 
 		// Look into having TransactionTable handle the filtering
 		return(

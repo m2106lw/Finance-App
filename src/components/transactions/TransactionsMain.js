@@ -29,7 +29,6 @@ class TransactionsMain extends Component {
 		}
 		this.handleYearSelection = this.handleYearSelection.bind(this);
 		this.deleteTransaction = this.deleteTransaction.bind(this);
-		this.onSave = this.onSave.bind(this);
 		this.postTransaction = this.postTransaction.bind(this);
 		this.checkForYear = this.checkForYear.bind(this);
 	}

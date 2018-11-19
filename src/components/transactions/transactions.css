@@ -1,11 +1,28 @@
-:local(.modal) {
-    width: 300px;
-    height: 300px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-top: -150px;
-    margin-left: -150px;
-    z-index: 9999;
-    background: papayawhip;
+.main-block {
+    display: flex;
+    justify-content: center;
 }
+
+.transaction-year-select { grid-area: selection; }
+.transaction-new-button { grid-area: button; }
+.transaction-data-table { grid-area: data-table; }
+
+.transaction-grid {
+  display: grid;
+  grid-template-areas:
+    'selection '
+    'button '
+    'data-table';
+  grid-gap: 10px;
+  background-color: white;
+  padding: 10px;
+  /*justify-items: center;*/
+}
+/*
+.transaction-grid > div {
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+}
+*/

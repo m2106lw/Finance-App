@@ -2,6 +2,7 @@ import React, { Component} from "react";
 import {hot} from "react-hot-loader";
 import { Switch, Route, Link } from 'react-router-dom';
 import "./App.css";
+window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
 import Header from "./components/Header";
 import Home from "./components/Home";

@@ -9,14 +9,14 @@ class TransactionAdd extends Component {
 		super(props);
 		this.state = {
 			modalOpen: false,
-			transaction: {"description": "", "amount": 0.00, "date": moment().format('YYYY-MM-DD'), transaction_type_id: 1, 'account_id': 0}
+			transaction: {"description": "", "amount": 0.00, "date": moment().format('YYYY-MM-DD'), "transaction_type_id": 1, 'account_id': 0}
 		}
 		this.onModalClose = this.onModalClose.bind(this);
 		this.handleModalOpen = this.handleModalOpen.bind(this);
 	}
 
 	onModalClose() {
-		this.setState({modalOpen: false, transaction: {}});
+		this.setState({modalOpen: false});
 	}
 
 	handleModalOpen(event) {
@@ -29,7 +29,7 @@ class TransactionAdd extends Component {
 	render(){
 		return(
 			<div>
-				<Button onClick={this.handleModalOpen} color="primary">Add a New transaction</Button>
+				<Button onClick={this.handleModalOpen} variant="contained" color="primary">Add a New transaction</Button>
 				<TransactionModal 
 					isOpen={this.state.modalOpen}
 					transaction={this.state.transaction}

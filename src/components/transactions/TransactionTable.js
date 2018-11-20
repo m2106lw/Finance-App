@@ -1,7 +1,6 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
 const moment = require('moment');
-window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 // AG-Grid
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -81,15 +80,13 @@ class TransactionTable extends Component {
 	
 	render(){
 		let transactions = this.props.transactions;
-		// Set up tranaaction types list
-		// Set up accounts list
 
-		// Find a better way to handle this
+		// TODO: Find a better way to handle this
 		if (this.props.transactionTypes.length == 0) return <p>Loading...</p>
 		if (this.props.accounts.length == 0) return <p>Loading...</p>
 
-		// Need to work on the custom filtering and sorting
-		// Look into default sorting by
+		// TODO: Need to work on the custom filtering and sorting
+		// TODO: Look into default sorting by
 		return (
 			<div className="ag-theme-material" style={{height: '600px',width: '75%'}}>
 				<AgGridReact

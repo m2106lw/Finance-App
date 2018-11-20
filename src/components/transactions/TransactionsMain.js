@@ -12,8 +12,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 import TransactionTable from './TransactionTable';
 import TransactionAdd from './TransactionAdd';
 import './transactions.css';
-import { months } from '../templates';
-import { capitalizeFirstLetter } from '../functions';
 
 class TransactionsMain extends Component {
 	constructor(props) {
@@ -22,7 +20,6 @@ class TransactionsMain extends Component {
 			transactions: [],
 			transactionTypes: [],
 			transactionYears: [],
-			transactionMonths: months,
 			accounts: [],
 			selectedYear: (new Date()).getFullYear(),
 			isLoading: true
@@ -85,6 +82,7 @@ class TransactionsMain extends Component {
 	
 	// This will delete a transaction based on the transaction_id that it recieves
 	deleteTransaction(transaction_id) {
+		// TODO: Add delete api call
 		/* let deleteCheck = axios.post("http://localhost:8080/api/postTransaction", {
 				transaction_id: transaction_id
 			})
@@ -102,17 +100,19 @@ class TransactionsMain extends Component {
 		this.setState({transactions: transactions})
 	}
 	
-	// Might need to return a success or not
 	// This will insert a new transaction into the database
+	// TODO: Figure out the weird data being sent to the database
+	// EX: "CALL POST_transaction('76',2,6,'2018-11-08','daacva',`_c` = , `_s` = 0, `_d` = false, `_h` = 0, `_n` = false)"
 	postTransaction(transaction) {
+		if (!("transaction_id" in transaction)) transaction.transaction_id = -1;
 		// Make axios call for insertion here, we need to wait for it so that we can get a actual transaction_id		
-		//console.log(transaction);
  		let transaction_id = axios.post("http://localhost:8080/api/postTransaction", {
 				transaction: transaction
 			})
 			.then(response => response.data)
 			.then(data => {
-				return data
+				console.log(data);
+				return data[0]["transaction_id"];
 			})
 			.catch(error => console.log(error));
 
@@ -127,6 +127,7 @@ class TransactionsMain extends Component {
 		else if (moment(transaction.date).year() == this.state.selectedYear) {
 			// Maybe try to sort this or see if the table can handle it
 			let transactions = this.state.transactions;
+			transaction.transaction_id = transaction_id;
 			transactions.push(transaction);
 			this.setState({transactions: transactions});
 		}

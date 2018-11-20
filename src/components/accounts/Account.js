@@ -1,5 +1,6 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
+import  { Redirect } from 'react-router-dom'
 const axios = require('axios');
 
 import AccountBalances from "./AccountBalances";
@@ -21,15 +22,16 @@ class Account extends Component {
 			.catch(error => console.log(error));
 	}
 	
-	// Need to figure out what to show for each account - either balance and/or transactions
-	// But then the above leads to should they be able to insert a transaction from this page? Will that make the other page redundent?
-	// Also need to figure out how to update an account here
+	// TODO: Look into updating an account. Might want to leave it to the main page. Maybe both?
 	render(){
+		if (this.state.account == undefined) {
+			return <Redirect to='/accounts'/>
+		}
 		return(
-			<div className="accountsPage">
-				<p>{this.state.account.name}</p>
-				<p>Current Balance: ${this.state.account.balance}</p>
-				<p>{this.state.account.description}</p>
+			<div className="indivdualAccount">
+				<h1>{this.state.account.name}</h1>
+				<h2>Current Balance: ${this.state.account.balance}</h2>
+				<h3>{this.state.account.description}</h3>
 				<AccountBalances account_id={this.props.match.params.id}/>
 			</div>
 		);

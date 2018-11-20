@@ -1,6 +1,6 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
-import transactionStyles from './transactions.css';
+const moment = require('moment');
 // Material UI
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -25,7 +25,7 @@ class TransactionModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            transaction: {"description": "", "amount": 0.0, "date": '0000-00-00', transaction_type_id: 1, 'account_id': 0}
+            transaction: {}
         }
         this.handeClose = this.handleClose.bind(this);
         this.handleTransactionChange = this.handleTransactionChange.bind(this);
@@ -44,14 +44,14 @@ class TransactionModal extends Component {
     handleClose(event, reason) {
         event.preventDefault()
         this.props.onModalClose();
-        this.setState({transaction: {"description": "", "amount": 0.0, "date": '0000-00-00', transaction_type_id: '1', 'account_id': 0}});
+        this.setState({transaction: {}});
     }
 
     // This will pass the data needed to the main page component
     handleCloseSave() {
         this.props.postTransaction(this.state.transaction);
         this.props.onModalClose();
-        this.setState({transaction: {"description": "", "amount": 0.0, "date": '0000-00-00', transaction_type_id: '1', 'account_id': 0}});
+        this.setState({transaction: {}});
     }
 
     // Update the transaction key on a change
@@ -83,14 +83,14 @@ class TransactionModal extends Component {
                         id="name"
                         label="Description"
                         type="text"
-                        value={this.state.transaction.description}
+                        value={this.state.transaction.description || ""}
                         fullWidth
                         onChange={e => this.handleTransactionChange("description", e.target.value)}
                     />
                     <TextField
                         label="Amount"
                         id="adornment-amount"
-                        value={this.state.transaction.amount}
+                        value={this.state.transaction.amount || 0.00}
                         onChange={e => this.handleTransactionChange("amount", e.target.value)}
                         InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
                         fullWidth
@@ -100,22 +100,22 @@ class TransactionModal extends Component {
                     <MuiPickersUtilsProvider utils={MomentUtils}>
                         <DatePicker 
                             label="Date"
-                            value={this.state.transaction.date}
+                            value={this.state.transaction.date || moment().format("YYYY-MM-DD")}
                             showTodayButton
-                            onChange={e => this.handleTransactionChange("date", e._d)}
+                            onChange={e => this.handleTransactionChange("date", moment(e._d).format("YYYY-MM-DD"))}
                         />
                     </MuiPickersUtilsProvider>
                     <br></br>
                     <FormControl>
                         <InputLabel htmlFor="edit-transaction-type">Type</InputLabel>
-                        <Select onChange={e => this.handleTransactionChange("transaction_type_id", e.target.value)} value={this.state.transaction.transaction_type_id}>
+                        <Select onChange={e => this.handleTransactionChange("transaction_type_id", e.target.value)} value={this.state.transaction.transaction_type_id || 1}>
 						    {this.props.transactionTypes.map((type) => <MenuItem key={`type-${type.name}`} value={type.transaction_type_id}>{capitalizeFirstLetter(type.name)}</MenuItem>)}
 					    </Select>
                     </FormControl>
                     <br></br>
                     <FormControl>
                         <InputLabel htmlFor="edit-account">Account</InputLabel>
-                        <Select onChange={e => this.handleTransactionChange("account_id", e.target.value)} value={this.state.transaction.account_id}>
+                        <Select onChange={e => this.handleTransactionChange("account_id", e.target.value)} value={this.state.transaction.account_id || 0}>
 						    {this.props.accounts.map((account) => <MenuItem key={`account-${account.name}`} value={account.account_id}>{account.name}</MenuItem>)}
 					    </Select>
                     </FormControl>

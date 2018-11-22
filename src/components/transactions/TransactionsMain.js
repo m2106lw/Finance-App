@@ -28,6 +28,7 @@ class TransactionsMain extends Component {
 		this.deleteTransaction = this.deleteTransaction.bind(this);
 		this.postTransaction = this.postTransaction.bind(this);
 		this.checkForYear = this.checkForYear.bind(this);
+		this.post_transaction = this.post_transaction.bind(this);
 	}
 	
 	// Need to work on updating differnet so there aren't three seperate renders
@@ -99,36 +100,42 @@ class TransactionsMain extends Component {
 		transactions.splice(index, 1);
 		this.setState({transactions: transactions})
 	}
+
+	// TODO: Implement this better, like better error handling and actually send a promise.
+	async post_transaction(transactionObject) {
+		return axios.post("http://localhost:8080/api/postTransaction", {
+				transaction: transactionObject
+		})
+		.then(response => response.data)
+		.then(data => {
+			console.log("Data post_transaction", data);
+			return data[0]["transaction_id"];
+		})
+		.catch(error => console.log(error));
+	}
 	
 	// This will insert a new transaction into the database
-	// TODO: Figure out the weird data being sent to the database
-	// EX: "CALL POST_transaction('76',2,6,'2018-11-08','daacva',`_c` = , `_s` = 0, `_d` = false, `_h` = 0, `_n` = false)"
-	postTransaction(transaction) {
-		if (!("transaction_id" in transaction)) transaction.transaction_id = -1;
-		// Make axios call for insertion here, we need to wait for it so that we can get a actual transaction_id		
- 		let transaction_id = axios.post("http://localhost:8080/api/postTransaction", {
-				transaction: transaction
-			})
-			.then(response => response.data)
-			.then(data => {
-				console.log(data);
-				return data[0]["transaction_id"];
-			})
-			.catch(error => console.log(error));
+	async postTransaction(transactionObject) {
+		// I don't like doing this, but it seems to come from the API server in the wrong format. Maybe fix on API side
+		transactionObject.date = moment(transactionObject.date).format('YYYY-MM-DD');
+		// Make axios call for insertion here, we need to wait for it so that we can get a actual transaction_id
+		let transaction_id = await this.post_transaction(transactionObject);
 
 		// Not sure if I want the new transaction visible when the year is different than the current one
 		// If the new or modified transaction has a year in its date that we don't already have then we will add it to our transactionYears list
 		// Otherwise there is no state to update
-		if (!this.checkForYear(transaction.date)) {
+		if (!this.checkForYear(transactionObject.date)) {
 			let transactionYears = this.state.transactionYears;
-			transactionYears.push({"year": moment(transaction.date).year()});
+			transactionYears.push({"year": moment(transactionObject.date).year()});
 			this.setState({transactionYears: transactionYears});
 		}
-		else if (moment(transaction.date).year() == this.state.selectedYear) {
+		// Getting the year ir something below seems to break the transaction
+		else if (moment(transactionObject.date).year() == this.state.selectedYear) {
+			console.log("Testing object", transactionObject)
 			// Maybe try to sort this or see if the table can handle it
 			let transactions = this.state.transactions;
-			transaction.transaction_id = transaction_id;
-			transactions.push(transaction);
+			transactionObject.transaction_id = transaction_id;
+			transactions.push(transactionObject);
 			this.setState({transactions: transactions});
 		}
 		// Extra code for if I change my mind

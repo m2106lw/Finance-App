@@ -8,10 +8,13 @@ const moment = require('moment');
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
-
+import CircularProgress from '@material-ui/core/CircularProgress';
+// Finance
 import TransactionTable from './TransactionTable';
 import TransactionAdd from './TransactionAdd';
 import './transactions.css';
+import {post_transaction, getTransactionsByYear, getTransactionTypes, getTransactionsYears} from '../api_calls/transactions';
+import {getAccounts} from '../api_calls/accounts'
 
 class TransactionsMain extends Component {
 	constructor(props) {
@@ -28,42 +31,31 @@ class TransactionsMain extends Component {
 		this.deleteTransaction = this.deleteTransaction.bind(this);
 		this.postTransaction = this.postTransaction.bind(this);
 		this.checkForYear = this.checkForYear.bind(this);
-		this.post_transaction = this.post_transaction.bind(this);
 	}
 	
 	// Need to work on updating differnet so there aren't three seperate renders
 	async componentDidMount() {
-		// Break this into it's own function
-		// Preferably change this to go after the years and look for only current year
+		// TODO: Handle loading on errors
 		// Grab all the transactions for the user
 		let user_id = this.props.user_id;
-		axios.get("http://localhost:8080/api/getTransactionsByYear?user_id=" + this.props.user_id + "&year=" + this.state.selectedYear)
-			.then(response => response.data)
-			.then(data => this.setState({transactions: data}))
-			.catch(error => console.log(error));
-			
+		let transactions = await getTransactionsByYear(user_id, this.state.selectedYear);
+		this.setState({transactions: transactions});
+		
 		// Now grab the transaction types
-		axios.get("http://localhost:8080/api/getTransactionTypes")
-			.then(response => response.data)
-			.then(data => this.setState({transactionTypes: data}))
-			.catch(error => console.log(error));
+		let transactionTypes = await getTransactionTypes();
+		this.setState({transactionTypes: transactionTypes})
 
-		// Need to clean this one up some
 		// Grab all the years the user has transactions for. Default to the current year
-		axios.get("http://localhost:8080/api/getTransactionsYears?user_id=" + user_id)
-			.then(response => response.data)
-			.then(data => {
-				let yearFound = data.find(year => year.year === this.state.selectedYear);
-				if(yearFound === undefined) {data.unshift({year: this.state.selectedYear})};
-				this.setState({transactionYears: data})
-			})
-			.catch(error => console.log(error));
+		let transactionYears = await getTransactionsYears(user_id);
+		let yearFound = transactionYears.find(year => year.year === this.state.selectedYear);
+		if(yearFound === undefined) {transactionYears.unshift({year: this.state.selectedYear})};
+		this.setState({transactionYears: transactionYears})
 		
 		// Finally grab all fo the users accounts, for selection
-		axios.get("http://localhost:8080/api/getAccounts?user_id=" + user_id)
-			.then(response => response.data)
-			.then(data => this.setState({accounts: data}))
-			.catch(error => console.log(error));
+		let accounts = await getAccounts(user_id);
+		this.setState({accounts: accounts})
+
+		// TODO: Handle when data does not load
 		this.setState({isLoading: false});
 	}
 	
@@ -100,26 +92,13 @@ class TransactionsMain extends Component {
 		transactions.splice(index, 1);
 		this.setState({transactions: transactions})
 	}
-
-	// TODO: Implement this better, like better error handling and actually send a promise.
-	async post_transaction(transactionObject) {
-		return axios.post("http://localhost:8080/api/postTransaction", {
-				transaction: transactionObject
-		})
-		.then(response => response.data)
-		.then(data => {
-			console.log("Data post_transaction", data);
-			return data[0]["transaction_id"];
-		})
-		.catch(error => console.log(error));
-	}
 	
 	// This will insert a new transaction into the database
 	async postTransaction(transactionObject) {
 		// I don't like doing this, but it seems to come from the API server in the wrong format. Maybe fix on API side
 		transactionObject.date = moment(transactionObject.date).format('YYYY-MM-DD');
 		// Make axios call for insertion here, we need to wait for it so that we can get a actual transaction_id
-		let transaction_id = await this.post_transaction(transactionObject);
+		let transaction_id = await post_transaction(transactionObject);
 
 		// Not sure if I want the new transaction visible when the year is different than the current one
 		// If the new or modified transaction has a year in its date that we don't already have then we will add it to our transactionYears list
@@ -154,7 +133,7 @@ class TransactionsMain extends Component {
 	//  Transaction Table: Display and edit existing transactions
 	render(){
 		if (this.state.isLoading) {
-			return (<p>Loading...</p>);
+			return <CircularProgress/>
 		}
 		let transactions = this.state.transactions || [];
 

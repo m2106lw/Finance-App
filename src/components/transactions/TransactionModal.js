@@ -1,6 +1,6 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
-const moment = require('moment');
+import moment from 'moment';
 // Material UI
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -61,7 +61,8 @@ class TransactionModal extends Component {
         this.setState({transaction: transaction});
 	}
 
-    // Figure out how to handle disabling buttons and stopping saving when data is incorrect
+    // TODO: Figure out how to handle disabling buttons and stopping saving when data is incorrect
+    // TODO: Change will-change: auto for dialog style to avoid firefox warning
     render() {
         if (this.props.isOpen === false)
             return null

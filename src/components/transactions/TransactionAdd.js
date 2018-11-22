@@ -1,6 +1,6 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
-const moment = require('moment');
+import moment from 'moment';
 import Button from '@material-ui/core/Button';
 import TransactionModal from './TransactionModal';
 
@@ -21,6 +21,8 @@ class TransactionAdd extends Component {
 
 	handleModalOpen(event) {
 		event.preventDefault();
+		// We need to update the default date to current date, no matter when open
+		// Maybe look at handling transaction defaults to TransactionModal
 		let transaction = this.state.transaction;
 		transaction["date"] = moment().format('YYYY-MM-DD');
 		this.setState({modalOpen: true, transaction: transaction});

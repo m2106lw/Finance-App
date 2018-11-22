@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 // TODO: Variablilze the api server url
 // TODO: Actually do error handling
 
@@ -42,6 +42,17 @@ const post_transaction = async (transactionObject) => {
     .catch(error => console.log(error));
 }
 
+const delete_transaction = async (transaction_id) => {
+    return axios.post(`${url}/api/deleteTransaction`, {
+        transaction_id: transaction_id
+    })
+    .then(response => response.data)
+    .then(data => {
+        return data;
+    })
+    .catch(error => console.log(error));
+}
+
 module.exports = {
-    getTransactionsByYear, getTransactionTypes, getTransactionsYears, post_transaction
+    getTransactionsByYear, getTransactionTypes, getTransactionsYears, post_transaction, delete_transaction
 }

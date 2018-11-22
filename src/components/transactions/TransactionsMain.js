@@ -1,8 +1,6 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
-//import { Link } from 'react-router-dom';
-const axios = require('axios');
-const moment = require('moment');
+import moment from 'moment';
 
 // Material UI
 import Select from '@material-ui/core/Select';
@@ -39,33 +37,38 @@ class TransactionsMain extends Component {
 		// Grab all the transactions for the user
 		let user_id = this.props.user_id;
 		let transactions = await getTransactionsByYear(user_id, this.state.selectedYear);
-		this.setState({transactions: transactions});
+		//this.setState({transactions: transactions});
 		
 		// Now grab the transaction types
 		let transactionTypes = await getTransactionTypes();
-		this.setState({transactionTypes: transactionTypes})
+		//this.setState({transactionTypes: transactionTypes})
 
 		// Grab all the years the user has transactions for. Default to the current year
 		let transactionYears = await getTransactionsYears(user_id);
 		let yearFound = transactionYears.find(year => year.year === this.state.selectedYear);
 		if(yearFound === undefined) {transactionYears.unshift({year: this.state.selectedYear})};
-		this.setState({transactionYears: transactionYears})
+		//this.setState({transactionYears: transactionYears})
 		
 		// Finally grab all fo the users accounts, for selection
 		let accounts = await getAccounts(user_id);
 		this.setState({accounts: accounts})
 
 		// TODO: Handle when data does not load
-		this.setState({isLoading: false});
+		this.setState({
+			transactions: transactions,
+			transactionTypes: transactionTypes,
+			transactionYears: transactionYears,
+			accounts: accounts,
+			isLoading: false
+		});
+		//this.setState({isLoading: false});
 	}
 	
-	handleYearSelection(year) {
+	async handleYearSelection(year) {
 		// We will need to load transactions for the selected year's data
 		if (year != this.state.selectedYear) {
-			axios.get("http://localhost:8080/api/getTransactionsByYear?user_id=" + this.props.user_id + "&year=" + year)
-				.then(response => response.data)
-				.then(data => this.setState({selectedYear: year, transactions: data}))
-				.catch(error => console.log(error));
+			let transactionYears = await getTransactionsYears(user_id);
+			this.setState({transactionYears: transactionYears});
 		}
 	}
 	
@@ -74,16 +77,9 @@ class TransactionsMain extends Component {
 	}
 	
 	// This will delete a transaction based on the transaction_id that it recieves
-	deleteTransaction(transaction_id) {
+	async deleteTransaction(transaction_id) {
 		// TODO: Add delete api call
-		/* let deleteCheck = axios.post("http://localhost:8080/api/postTransaction", {
-				transaction_id: transaction_id
-			})
-			.then(response => response.data)
-			.then(data => {
-				return data
-			})
-			.catch(error => console.log(error)); */
+		// let deleteCheck = await delete_transaction(transaction_id);
 		// Delete this transaction from our state
 		let transactions = this.state.transactions;
 		let index = transactions.findIndex((transaction) => {
@@ -117,14 +113,6 @@ class TransactionsMain extends Component {
 			transactions.push(transactionObject);
 			this.setState({transactions: transactions});
 		}
-		// Extra code for if I change my mind
-/* 		let transactionYears = this.state.transactionYears;
-		if (!this.checkForYear(transaction.date)) {
-			transactionYears.push({"year": moment(transaction.date).year()})
-		}
-		let transactions = this.state.transactions;
-		transactions.push(transaction);
-		this.setState({transactions: transactions, transactionYears: transactionYears}); */
 	}
 	
 	// Main design:

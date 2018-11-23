@@ -1,6 +1,7 @@
 import React, { Component} from "react";
 import { Link } from 'react-router-dom';
 import {hot} from "react-hot-loader";
+import Button from '@material-ui/core/Button';
 
 // The Header creates links that can be used to navigate between routes.
 class Header extends Component {
@@ -13,16 +14,17 @@ class Header extends Component {
 	// Possible idea: hamburger menu of accounts. Not sure since that makes this require an api call
 	// TODO: Spending report will contain graphs of your spending for each year, month, and account. This will include averages and stuff like that
 	render () {
+		//<td><Link to='/transactions'>Transactions</Link></td>
 		return (
 			<header>
 				<nav>
 					<table>
 						<tbody>
 						<tr>
-							<td><Link to='/'>Home</Link></td>
-							<td><Link to='/accounts'>Accounts</Link></td>
-							<td><Link to='/transactions'>Transactions</Link></td>
-							<td><Link to='/spending_report'>Spending Report</Link></td>
+							<td><Button component={Link} to="/">Home</Button></td>
+							<td><Button component={Link} to="/accounts">Accounts</Button></td>
+							<td><Button component={Link} to="/transactions">Transactions</Button></td>
+							<td><Button component={Link} to="/spending_reports">Spending Report</Button></td>
 						</tr>
 						</tbody>
 					</table>

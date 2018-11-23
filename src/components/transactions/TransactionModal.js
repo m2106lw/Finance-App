@@ -79,7 +79,6 @@ class TransactionModal extends Component {
                         Edit the data for the transaction
                     </DialogContentText>
                     <TextField
-                        autoFocus
                         margin="dense"
                         id="name"
                         label="Description"
@@ -95,7 +94,6 @@ class TransactionModal extends Component {
                         onChange={e => this.handleTransactionChange("amount", e.target.value)}
                         InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
                         fullWidth
-                        autoFocus
                         margin="dense"
                     />
                     <MuiPickersUtilsProvider utils={MomentUtils}>

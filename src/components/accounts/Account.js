@@ -1,29 +1,34 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
 import  { Redirect } from 'react-router-dom'
-const axios = require('axios');
+
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import AccountBalances from "./AccountBalances";
+import {getAccount} from "../api_calls/accounts";
 
 class Account extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			account: {}
+			account: {},
+			isLoading: true
 		};
 	}
 	
-	componentDidMount() {
-		let user_id = this.props.user_id
+	async componentDidMount() {
+		let user_id = this.props.user_id;
 		let account_id = this.props.match.params.id;
-		axios.get("http://localhost:8080/api/getAccount?account_id=" + account_id)
-			.then(response => response.data)
-			.then(data => this.setState({ account: data[0] }))
-			.catch(error => console.log(error));
+		let account = await getAccount(user_id, account_id);
+		this.setState({account: account, isLoading: false});
 	}
 	
 	// TODO: Look into updating an account. Might want to leave it to the main page. Maybe both?
 	render(){
+		if (this.state.isLoading) {
+			return <CircularProgress/>
+		}
+
 		if (this.state.account == undefined) {
 			return <Redirect to='/accounts'/>
 		}

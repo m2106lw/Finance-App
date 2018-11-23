@@ -42,9 +42,10 @@ const post_transaction = async (transactionObject) => {
     .catch(error => console.log(error));
 }
 
-const delete_transaction = async (transaction_id) => {
-    return axios.post(`${url}/api/deleteTransaction`, {
-        transaction_id: transaction_id
+const delete_transaction = async (user_id, transaction_id) => {
+    return axios.delete(`${url}/api/deleteTransaction`, {
+        transaction_id: transaction_id,
+        user_id: user_id
     })
     .then(response => response.data)
     .then(data => {

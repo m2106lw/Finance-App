@@ -11,7 +11,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import TransactionTable from './TransactionTable';
 import TransactionAdd from './TransactionAdd';
 import './transactions.css';
-import {post_transaction, getTransactionsByYear, getTransactionTypes, getTransactionsYears} from '../api_calls/transactions';
+import {post_transaction, getTransactionsByYear, getTransactionTypes, getTransactionsYears, delete_transaction} from '../api_calls/transactions';
 import {getAccounts} from '../api_calls/accounts'
 
 class TransactionsMain extends Component {
@@ -67,8 +67,9 @@ class TransactionsMain extends Component {
 	async handleYearSelection(year) {
 		// We will need to load transactions for the selected year's data
 		if (year != this.state.selectedYear) {
-			let transactionYears = await getTransactionsYears(user_id);
-			this.setState({transactionYears: transactionYears});
+			let user_id = this.props.user_id;
+			let transactions = await getTransactionsByYear(user_id, year);
+			this.setState({selectedYear: year, transactions: transactions});
 		}
 	}
 	
@@ -78,8 +79,9 @@ class TransactionsMain extends Component {
 	
 	// This will delete a transaction based on the transaction_id that it recieves
 	async deleteTransaction(transaction_id) {
-		// TODO: Add delete api call
-		// let deleteCheck = await delete_transaction(transaction_id);
+		// TODO: Display error on failure to delete
+		let deleteCheck = await delete_transaction(this.props.user_id, transaction_id);
+		console.log("deleteCheck", deleteCheck);
 		// Delete this transaction from our state
 		let transactions = this.state.transactions;
 		let index = transactions.findIndex((transaction) => {

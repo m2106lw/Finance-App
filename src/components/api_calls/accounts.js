@@ -8,7 +8,25 @@ const getAccounts = async (user_id) => {
     return axios.get(`${url}/api/getAccounts?user_id=${user_id}`)
     .then(response => response.data)
     .then(data => {
-        return data
+        return data;
+    })
+    .catch(error => console.log(error));
+}
+
+const getAccount = async (user_id, account_id) => {
+    return axios.get(`${url}/api/getAccount?account_id=${account_id}&user_id=${user_id}`)
+    .then(response => response.data)
+    .then(data => {
+        return data[0];
+    })
+    .catch(error => console.log(error));
+}
+
+const getAccountBalances = async (account_id) => {
+    return axios.get(`${url}/api/getAccountBalances?account_id=${account_id}`)
+    .then(response => response.data)
+    .then(data => {
+        return data[0];
     })
     .catch(error => console.log(error));
 }
@@ -30,5 +48,5 @@ const postAccount = async (user_id, name, description) => {
 }
 
 module.exports = {
-    getAccounts, postAccount
+    getAccounts, getAccount, getAccountBalances, postAccount
 }

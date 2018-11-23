@@ -1,11 +1,12 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
-const axios = require('axios');
-const moment = require('moment');
+import moment from 'moment';
 // AG-Grid
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
+
+import {getAccountBalances} from '../api_calls/balances'
 
 class AccountBalances extends Component {
 	constructor(props) {
@@ -18,14 +19,10 @@ class AccountBalances extends Component {
 		this.rowDate = this.rowDate.bind(this);
 	}
 	
-	componentDidMount() {
+	async componentDidMount() {
 		let account_id = this.props.account_id;
-		axios.get("http://localhost:8080/api/getAccountBalances?account_id=" + account_id)
-			.then(response => response.data)
-			.then(data => {
-				this.setState({ balances: data })
-			})
-			.catch(error => console.log(error));
+		let balances = await getAccountBalances(account_id);
+		this.setState({balances: balances});
 	}
 
 	onGridReady(params) {
@@ -42,9 +39,6 @@ class AccountBalances extends Component {
 		return moment(row.data.date).format("YYYY-MM-DD")
 	}
 	
-	// Need to figure out what to show for each account - either balance and/or transactions
-	// But then the above leads to should they be able to insert a transaction from this page? Will that make the other page redundent?
-	// Also need to figure out how to update an account here
 	render(){
 		return(
 			<div className="ag-theme-material" style={{height: '600px',width: '75%'}}>

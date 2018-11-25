@@ -5,7 +5,7 @@ import axios from 'axios';
 const url = "http://localhost:8080";
 
 const getAccountBalances = async (account_id) => {
-    return axios.get(`${url}/api/getAccountBalances?account_id=${account_id}`)
+    return axios.get(`${url}/api/balance/getAccountBalances?account_id=${account_id}`)
     .then(response => response.data)
     .then(data => {
         return data;

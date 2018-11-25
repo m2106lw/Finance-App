@@ -5,7 +5,7 @@ import axios from 'axios';
 const url = "http://localhost:8080";
 
 const getAccounts = async (user_id) => {
-    return axios.get(`${url}/api/getAccounts?user_id=${user_id}`)
+    return axios.get(`${url}/api/account/getAccounts?user_id=${user_id}`)
     .then(response => response.data)
     .then(data => {
         return data;
@@ -14,7 +14,7 @@ const getAccounts = async (user_id) => {
 }
 
 const getAccount = async (user_id, account_id) => {
-    return axios.get(`${url}/api/getAccount?account_id=${account_id}&user_id=${user_id}`)
+    return axios.get(`${url}/api/account/getAccount?account_id=${account_id}&user_id=${user_id}`)
     .then(response => response.data)
     .then(data => {
         return data[0];
@@ -23,7 +23,7 @@ const getAccount = async (user_id, account_id) => {
 }
 
 const getAccountBalances = async (account_id) => {
-    return axios.get(`${url}/api/getAccountBalances?account_id=${account_id}`)
+    return axios.get(`${url}/api/account/getAccountBalances?account_id=${account_id}`)
     .then(response => response.data)
     .then(data => {
         return data[0];
@@ -32,7 +32,7 @@ const getAccountBalances = async (account_id) => {
 }
 
 const postAccount = async (user_id, name, description) => {
-    return axios.post("http://localhost:8080/api/postAccount", {
+    return axios.post(`${url}/api/account/postAccount`, {
         user_id: user_id,
         account_name: name,
         account_description: description,

@@ -5,7 +5,7 @@ import axios from 'axios';
 const url = "http://localhost:8080";
 
 const getTransactionsByYear = async (user_id, year) => {
-    return axios.get(`${url}/api/getTransactionsByYear?user_id=${user_id}&year=${year}`)
+    return axios.get(`${url}/api/transaction/getTransactionsByYear?user_id=${user_id}&year=${year}`)
     .then(response => response.data)
     .then(data => {
         return data
@@ -13,8 +13,9 @@ const getTransactionsByYear = async (user_id, year) => {
     .catch(error => console.log(error));
 }
 
+// TODO: Move this one to it's own file
 const getTransactionTypes = async () => {
-    return axios.get(`${url}/api/getTransactionTypes`)
+    return axios.get(`${url}/api/transaction_types/getTransactionTypes`)
     .then(response => response.data)
     .then(data => {
         return data;
@@ -23,7 +24,7 @@ const getTransactionTypes = async () => {
 }
 
 const getTransactionsYears = async (user_id) => {
-    return axios.get(`${url}/api/getTransactionsYears?user_id=${user_id}`)
+    return axios.get(`${url}/api/transaction/getTransactionsYears?user_id=${user_id}`)
     .then(response => response.data)
     .then(data => {
         return data;
@@ -32,7 +33,7 @@ const getTransactionsYears = async (user_id) => {
 }
 
 const post_transaction = async (transactionObject) => {
-    return axios.post(`${url}/api/postTransaction`, {
+    return axios.post(`${url}/api/transaction/postTransaction`, {
         transaction: transactionObject
     })
     .then(response => response.data)
@@ -43,7 +44,7 @@ const post_transaction = async (transactionObject) => {
 }
 
 const delete_transaction = async (user_id, transaction_id) => {
-    return axios.delete(`${url}/api/deleteTransaction`, {
+    return axios.delete(`${url}/api/transaction/deleteTransaction`, {
         transaction_id: transaction_id,
         user_id: user_id
     })

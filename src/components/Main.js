@@ -5,6 +5,7 @@ import { Switch, Route } from 'react-router-dom';
 import Home from "./Home";
 import AccountsRouter from "./accounts/AccountsRouter";
 import Login from "./login/Login";
+import ReportsMain from "./spending_reports/ReportsMain";
 
 class Main extends Component {
 	constructor(props) {
@@ -21,6 +22,7 @@ class Main extends Component {
 					<Route exact path='/home' component={Home} />
 					<Route path="/login" render={(props) => <Login {...props} parentState={this.props.parentState} handleLogin={this.props.handleLogin} handleLoginChange={this.props.handleLoginChange} />} />
 					<Route path='/accounts' render={(props) => <AccountsRouter {...props} user_id={this.props.parentState.user_id} />} />
+					<Route path='/spending_reports' render={(props) => <ReportsMain {...props} user_id={this.props.parentState.user_id} />} />
 					<Route render={() => (<div> Sorry, this page does not exist. </div>)} />
 				</Switch>
 			</main>

@@ -56,7 +56,6 @@ class TransactionModal extends Component {
         }
     }
 
-    // TODO: The data does not seem like it is wiped or perhaps I'm not making a copy so the data is changed, but not saved
     // This will save all data that has been changed, but not saved in the table.
     handleClose(event, reason) {
         event.preventDefault()

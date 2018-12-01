@@ -23,12 +23,10 @@ class App extends Component {
 		this.handleAuthSucceed = this.handleAuthSucceed.bind(this);
 	}
 	
-	// I believe this to be causing a rerender unfortunately 
 	handleAuthSucceed(auth_token) {
 		this.setState({user_id: 1, isAuthenticated: true, auth_token: auth_token});
 	}
 	
-	//<Link to='/login'>Login</Link>
 	render(){
 		return(
 			<div className="main-grid">

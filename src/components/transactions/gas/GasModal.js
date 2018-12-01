@@ -19,9 +19,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 
-import { capitalizeFirstLetter } from '../functions';
-
-class TransactionModal extends Component {
+class GasModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -34,23 +32,29 @@ class TransactionModal extends Component {
     }
 
     // Figure out if this is correct
+    // TODO: Check transactions - This may not be loading right - Its not
+    // TODO: Figure out how to handle a new transaction
     componentDidUpdate(prevProps) {
         // We make deep copies of the data we want
         if (JSON.stringify(this.props.transaction) !== JSON.stringify(prevProps.transaction)) {
-            let transaction_id = this.props.transaction.transaction_id;
-            let description = this.props.transaction.description;
-            let amount = this.props.transaction.amount;
+            let gas_id = this.props.transaction.gas_id;
+            let milage = this.props.transaction.milage;
+            let price = this.props.transaction.price;
             let date = this.props.transaction.date;
-            let transaction_type_id = this.props.transaction.transaction_type_id;
+            let car_id = this.props.transaction.car_id;
             let account_id = this.props.transaction.account_id;
+            let gallons = this.props.transaction.gallons;
+
+            console.log("gas_id", gas_id)
 
             let transaction = {
-                transaction_id: transaction_id,
-                description: description,
-                amount: amount,
+                gas_id: gas_id,
+                milage: milage,
+                price: price,
                 date: date,
-                transaction_type_id: transaction_type_id,
-                account_id: account_id
+                car_id: car_id,
+                account_id: account_id,
+                gallons: gallons
             }
             this.setState({transaction: transaction});
         }
@@ -65,7 +69,7 @@ class TransactionModal extends Component {
 
     // This will pass the data needed to the main page component
     handleCloseSave() {
-        this.props.postTransaction(this.state.transaction);
+        this.props.postGasTransaction(this.state.transaction);
         this.props.onModalClose();
         this.setState({transaction: {}});
     }
@@ -75,7 +79,6 @@ class TransactionModal extends Component {
  		let transaction = this.state.transaction;
         transaction[key] = value;
         this.setState({transaction: transaction});
-        console.log(transaction);
 	}
 
     // TODO: Figure out how to handle disabling buttons and stopping saving when data is incorrect
@@ -84,35 +87,15 @@ class TransactionModal extends Component {
         if (this.props.isOpen === false)
             return null
 
+        console.log("modal transaction", this.state.transaction);
+
         return (
-            <Dialog
-                open={this.props.isOpen}
-                onClose={this.handleClose}
-                aria-labelledby="form-dialog-title"
-            >
+            <Dialog open={this.props.isOpen} onClose={this.handleClose} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Edit Table Row</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Edit the data for the transaction
                     </DialogContentText>
-                    <TextField
-                        margin="dense"
-                        id="name"
-                        label="Description"
-                        type="text"
-                        value={this.state.transaction.description || ""}
-                        fullWidth
-                        onChange={e => this.handleTransactionChange("description", e.target.value)}
-                    />
-                    <TextField
-                        label="Amount"
-                        id="adornment-amount"
-                        value={this.state.transaction.amount || 0.00}
-                        onChange={e => this.handleTransactionChange("amount", e.target.value)}
-                        InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
-                        fullWidth
-                        margin="dense"
-                    />
                     <MuiPickersUtilsProvider utils={MomentUtils}>
                         <DatePicker 
                             label="Date"
@@ -121,11 +104,38 @@ class TransactionModal extends Component {
                             onChange={e => this.handleTransactionChange("date", moment(e._d).format("YYYY-MM-DD"))}
                         />
                     </MuiPickersUtilsProvider>
+                    <TextField
+                        label="Price"
+                        id="adornment-price"
+                        value={this.state.transaction.price || 0.00}
+                        onChange={e => this.handleTransactionChange("price", e.target.value)}
+                        InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
+                        fullWidth
+                        margin="dense"
+                    />
+                    <TextField
+                        label="Milage"
+                        id="adornment-milage"
+                        value={this.state.transaction.milage || 0}
+                        onChange={e => this.handleTransactionChange("milage", e.target.value)}
+                        InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
+                        fullWidth
+                        margin="dense"
+                    />
+                    <TextField
+                        label="Gallons"
+                        id="adornment-gallons"
+                        value={this.state.transaction.milage || 0}
+                        onChange={e => this.handleTransactionChange("gallons", e.target.value)}
+                        InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
+                        fullWidth
+                        margin="dense"
+                    />
                     <br></br>
                     <FormControl>
-                        <InputLabel htmlFor="edit-transaction-type">Type</InputLabel>
-                        <Select onChange={e => this.handleTransactionChange("transaction_type_id", e.target.value)} value={this.state.transaction.transaction_type_id || 1}>
-						    {this.props.transactionTypes.map((type) => <MenuItem key={`type-${type.name}`} value={type.transaction_type_id}>{capitalizeFirstLetter(type.name)}</MenuItem>)}
+                        <InputLabel htmlFor="edit-car">Car</InputLabel>
+                        <Select onChange={e => this.handleTransactionChange("car_id", e.target.value)} value={this.state.transaction.car_id || 0}>
+						    {this.props.cars.map((car) => <MenuItem key={`type-${car.name}`} value={car.car_id}>{car.name}</MenuItem>)}
 					    </Select>
                     </FormControl>
                     <br></br>
@@ -148,4 +158,4 @@ class TransactionModal extends Component {
         )
     }
 }
-export default hot(module)(TransactionModal);
+export default hot(module)(GasModal);

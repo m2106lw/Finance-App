@@ -9,6 +9,7 @@ import Home from "./components/Home";
 import AccountsRouter from "./components/accounts/AccountsRouter";
 import Login from "./components/login/Login";
 import TransactionsRouter from "./components/transactions/TransactionsRouter";
+import ReportsRouter from "./components/spending_reports/ReportsRouter";
 
 class App extends Component {
 	constructor() {
@@ -41,6 +42,7 @@ class App extends Component {
 					<Route path="/login" render={(props) => <Login {...props} onAuthSucceed={this.handleAuthSucceed} isAuthenticated={this.state.isAuthenticated}  />} />
 					<Route path='/accounts' render={(props) => <AccountsRouter {...props} user_id={this.state.user_id} isAuthenticated={this.state.isAuthenticated} />} />
 					<Route path='/transactions' render={(props) => <TransactionsRouter {...props} user_id={this.state.user_id} isAuthenticated={this.state.isAuthenticated} />} />
+					<Route path='/spending_reports' render={(props) => <ReportsRouter {...props} user_id={this.state.user_id} isAuthenticated={this.state.isAuthenticated} />} />
 					<Route render={() => (<div> Sorry, this page does not exist. </div>)} />
 				</Switch></div>
 			</div>

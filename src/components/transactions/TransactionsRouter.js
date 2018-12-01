@@ -1,11 +1,10 @@
 import React, { Component} from "react";
-import { Link } from 'react-router-dom';
 import {hot} from "react-hot-loader";
 import { Switch, Route } from 'react-router-dom';
 
 import TransactionsMain from "./TransactionsMain";
 
-// This switch handles the accounts pages
+// This switch handles the transactions pages
 class TransactionsRouter extends Component {
 	constructor(props) {
 		super(props);

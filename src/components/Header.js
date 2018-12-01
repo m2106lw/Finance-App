@@ -46,7 +46,7 @@ class Header extends Component {
 								</Button>
 								<Menu id="simple-menu" anchorEl={anchorEl} open={Boolean(anchorEl)}	onClose={this.handleClose}>
           							<MenuItem component={Link} to="/transactions" onClick={this.handleClose}>All Transactions</MenuItem>
-          							<MenuItem component={Link} to="/gas_transactions" onClick={this.handleClose}>Gas Transactions</MenuItem>
+          							<MenuItem component={Link} to="/transactions/gas" onClick={this.handleClose}>Gas Transactions</MenuItem>
         						</Menu>
 							</td>
 							<td><Button component={Link} to="/spending_reports">Spending Report</Button></td>

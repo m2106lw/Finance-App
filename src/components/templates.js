@@ -1,5 +1,5 @@
 const months = [
-	{"value": -1, "name": "Any"},
+	{"value": -1, "name": "All"},
 	{"value": 0, "name": "Jan"},
 	{"value": 1, "name": "Feb"},
 	{"value": 2, "name": "March"},

@@ -11,7 +11,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import TransactionTable from './TransactionTable';
 import TransactionAdd from './TransactionAdd';
 import './transactions.css';
-import {post_transaction, getTransactionsByYear, getTransactionTypes, getTransactionsYears, delete_transaction} from '../api_calls/transactions';
+import {post_transaction, getTransactionsByYear, getTransactionsYears, delete_transaction} from '../api_calls/transactions';
+import {getTransactionTypes} from '../api_calls/transaction_types';
 import {getAccounts} from '../api_calls/accounts'
 
 class TransactionsMain extends Component {
@@ -81,14 +82,16 @@ class TransactionsMain extends Component {
 	async deleteTransaction(transaction_id) {
 		// TODO: Display error on failure to delete
 		let deleteCheck = await delete_transaction(this.props.user_id, transaction_id);
-		console.log("deleteCheck", deleteCheck);
+
 		// Delete this transaction from our state
-		let transactions = this.state.transactions;
-		let index = transactions.findIndex((transaction) => {
-			return transaction["transaction_id"] == transaction_id;
-		});
-		transactions.splice(index, 1);
-		this.setState({transactions: transactions})
+		if (deleteCheck === true) {
+			let transactions = this.state.transactions;
+			let index = transactions.findIndex((transaction) => {
+				return transaction["transaction_id"] == transaction_id;
+			});
+			transactions.splice(index, 1);
+			this.setState({transactions: transactions})
+		}
 	}
 	
 	// This will insert a new transaction into the database
@@ -108,11 +111,27 @@ class TransactionsMain extends Component {
 		}
 		// Getting the year ir something below seems to break the transaction
 		else if (moment(transactionObject.date).year() == this.state.selectedYear) {
-			console.log("Testing object", transactionObject)
-			// Maybe try to sort this or see if the table can handle it
+
+			// We have to see if the transaction is a new or old one
 			let transactions = this.state.transactions;
-			transactionObject.transaction_id = transaction_id;
-			transactions.push(transactionObject);
+			let index = transactions.findIndex((transaction) => {
+				return transaction["transaction_id"] == transaction_id;
+			});
+
+			// If it is already in the table then update the transaction
+			// Otherwise we will push the new object into the array
+			if (index !== -1) {
+				transactions[index] = transactionObject;
+			}
+			else {
+				transactionObject.transaction_id = transaction_id;
+				// We look for the position to insert the new object so it will appear in order we have the data
+				let dateIndex = transactions.findIndex((transaction) => {
+					return transaction["date"] < transactionObject["date"];
+				});
+				// Insert the object at the right index, but don't delete anything
+				transactions.splice(dateIndex, 0, transactionObject);
+			}
 			this.setState({transactions: transactions});
 		}
 	}
@@ -122,6 +141,7 @@ class TransactionsMain extends Component {
 	//  New Transaction Button: Creates a new transaction
 	//  Transaction Table: Display and edit existing transactions
 	render(){
+		// TODO: Check if we are doing unecessary renders
 		if (this.state.isLoading) {
 			return <CircularProgress/>
 		}

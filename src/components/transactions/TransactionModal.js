@@ -34,13 +34,30 @@ class TransactionModal extends Component {
     }
 
     // Figure out if this is correct
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (JSON.stringify(this.props.transaction) !== JSON.stringify(prevState.transaction)) {
-            this.setState({transaction: this.props.transaction});
+    componentDidUpdate(prevProps) {
+        // We make deep copies of the data we want
+        if (JSON.stringify(this.props.transaction) !== JSON.stringify(prevProps.transaction)) {
+            let transaction_id = this.props.transaction.transaction_id;
+            let description = this.props.transaction.description;
+            let amount = this.props.transaction.amount;
+            let date = this.props.transaction.date;
+            let transaction_type_id = this.props.transaction.transaction_type_id;
+            let account_id = this.props.transaction.account_id;
+
+            let transaction = {
+                transaction_id: transaction_id,
+                description: description,
+                amount: amount,
+                date: date,
+                transaction_type_id: transaction_type_id,
+                account_id: account_id
+            }
+            this.setState({transaction: transaction});
         }
     }
 
-    // This will not save the data
+    // TODO: The data does not seem like it is wiped or perhaps I'm not making a copy so the data is changed, but not saved
+    // This will save all data that has been changed, but not saved in the table.
     handleClose(event, reason) {
         event.preventDefault()
         this.props.onModalClose();

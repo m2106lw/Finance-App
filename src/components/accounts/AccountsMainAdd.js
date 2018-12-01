@@ -4,6 +4,7 @@ import {hot} from "react-hot-loader";
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
+// TODO: Check if we can make this a purecomponent, not sure if worth it
 class AccountsMain extends Component {
     constructor(props) {
         super(props);

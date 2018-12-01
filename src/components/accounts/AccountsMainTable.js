@@ -13,7 +13,7 @@ class AccountsMainTable extends Component {
 		// Make sure these are not needed to be rerendered everytime
 		this.rowName = this.rowName.bind(this);
 		this.rowBalance = this.rowBalance.bind(this);
-    }
+	}
     
 	onGridReady(params) {
 		this.gridApi = params.api;

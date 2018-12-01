@@ -13,16 +13,6 @@ const getTransactionsByYear = async (user_id, year) => {
     .catch(error => console.log(error));
 }
 
-// TODO: Move this one to it's own file
-const getTransactionTypes = async () => {
-    return axios.get(`${url}/api/transaction_types/getTransactionTypes`)
-    .then(response => response.data)
-    .then(data => {
-        return data;
-    })
-    .catch(error => console.log(error));
-}
-
 const getTransactionsYears = async (user_id) => {
     return axios.get(`${url}/api/transaction/getTransactionsYears?user_id=${user_id}`)
     .then(response => response.data)
@@ -44,10 +34,8 @@ const post_transaction = async (transactionObject) => {
 }
 
 const delete_transaction = async (user_id, transaction_id) => {
-    return axios.delete(`${url}/api/transaction/deleteTransaction`, {
-        transaction_id: transaction_id,
-        user_id: user_id
-    })
+    console.log(transaction_id);
+    return axios.delete(`${url}/api/transaction/deleteTransaction?user_id=${user_id}&transaction_id=${transaction_id}`)
     .then(response => response.data)
     .then(data => {
         return data;
@@ -56,5 +44,5 @@ const delete_transaction = async (user_id, transaction_id) => {
 }
 
 module.exports = {
-    getTransactionsByYear, getTransactionTypes, getTransactionsYears, post_transaction, delete_transaction
+    getTransactionsByYear, getTransactionsYears, post_transaction, delete_transaction
 }

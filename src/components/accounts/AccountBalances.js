@@ -25,6 +25,8 @@ class AccountBalances extends Component {
 		this.setState({balances: balances});
 	}
 
+	// Maybe add a refresh option?
+
 	onGridReady(params) {
 		this.gridApi = params.api;
 		this.gridColumnApi = params.columnApi;

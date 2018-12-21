@@ -5,7 +5,7 @@ import axios from 'axios';
 const url = "http://localhost:8080";
 
 const getTransactionTypes = async () => {
-    return axios.get(`${url}/api/transaction_types/getTransactionTypes`)
+    return axios.get(`${url}/api/transaction_types/transaction_types`)
     .then(response => response.data)
     .then(data => {
         return data;

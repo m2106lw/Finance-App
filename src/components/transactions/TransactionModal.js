@@ -25,64 +25,80 @@ class TransactionModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            transaction: {}
+            transaction_id: -1,
+            description: "",
+            amount: 0.00,
+            date: moment().format("YYYY-MM-DD"),
+            transaction_type_id: 1,
+            account_id: 0
+
         }
         this.handeClose = this.handleClose.bind(this);
         this.handleTransactionChange = this.handleTransactionChange.bind(this);
         this.handleClose = this.handeClose.bind(this);
         this.handleCloseSave = this.handleCloseSave.bind(this);
+        this.emptyModal = this.emptyModal.bind(this);
     }
 
-    // Figure out if this is correct
     componentDidUpdate(prevProps) {
-        // We make deep copies of the data we want
-        if (JSON.stringify(this.props.transaction) !== JSON.stringify(prevProps.transaction)) {
-            let transaction_id = this.props.transaction.transaction_id;
-            let description = this.props.transaction.description;
-            let amount = this.props.transaction.amount;
-            let date = this.props.transaction.date;
-            let transaction_type_id = this.props.transaction.transaction_type_id;
-            let account_id = this.props.transaction.account_id;
-
-            let transaction = {
-                transaction_id: transaction_id,
-                description: description,
-                amount: amount,
-                date: date,
-                transaction_type_id: transaction_type_id,
-                account_id: account_id
-            }
-            this.setState({transaction: transaction});
+        // We check the transaction id to see if we have a new transaction coming into the modal
+        if (prevProps.transaction.transaction_id !== this.props.transaction.transaction_id) {
+            // Now take the object that we recieved and break it into seperate parts to be editable
+            // This is done to a weird bug where something had to always remain in the value field with my previous implementation
+            this.setState({
+                transaction_id: this.props.transaction.transaction_id,
+                description: this.props.transaction.description,
+                amount: this.props.transaction.amount,
+                date: this.props.transaction.date,
+                transaction_type_id: this.props.transaction.transaction_type_id,
+                account_id: this.props.transaction.account_id
+            })
         }
+    }
+
+    // This will empty the data - I think - so that we have a blank slate when open the modal
+    emptyModal() {
+        this.setState({
+            transaction_id: -1,
+            description: "",
+            amount: 0.00,
+            date: moment().format("YYYY-MM-DD"),
+            transaction_type_id: 1,
+            account_id: 0
+        });
     }
 
     // This will save all data that has been changed, but not saved in the table.
     handleClose(event, reason) {
-        event.preventDefault()
+        event.preventDefault();
+        this.emptyModal();
         this.props.onModalClose();
-        this.setState({transaction: {}});
     }
 
     // This will pass the data needed to the main page component
     handleCloseSave() {
-        this.props.postTransaction(this.state.transaction);
+        let transaction = {
+            transaction_id: this.state.transaction_id,
+            description: this.state.description,
+            amount: this.state.amount,
+            date: this.state.date,
+            transaction_type_id: this.state.transaction_type_id,
+            account_id: this.state.account_id
+        };
+        this.props.postTransaction(transaction);
+        this.emptyModal();
         this.props.onModalClose();
-        this.setState({transaction: {}});
     }
 
     // Update the transaction key on a change
     handleTransactionChange(key, value) {
- 		let transaction = this.state.transaction;
-        transaction[key] = value;
-        this.setState({transaction: transaction});
-        console.log(transaction);
+        this.setState({[key]: value});
 	}
 
     // TODO: Figure out how to handle disabling buttons and stopping saving when data is incorrect
     // TODO: Change will-change: auto for dialog style to avoid firefox warning
     render() {
-        if (this.props.isOpen === false)
-            return null
+        if (this.props.isOpen === false) return null
 
         return (
             <Dialog
@@ -100,14 +116,14 @@ class TransactionModal extends Component {
                         id="name"
                         label="Description"
                         type="text"
-                        value={this.state.transaction.description || ""}
+                        value={this.state.description}
                         fullWidth
                         onChange={e => this.handleTransactionChange("description", e.target.value)}
                     />
                     <TextField
                         label="Amount"
                         id="adornment-amount"
-                        value={this.state.transaction.amount || 0.00}
+                        value={this.state.amount}
                         onChange={e => this.handleTransactionChange("amount", e.target.value)}
                         InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
                         fullWidth
@@ -116,7 +132,7 @@ class TransactionModal extends Component {
                     <MuiPickersUtilsProvider utils={MomentUtils}>
                         <DatePicker 
                             label="Date"
-                            value={this.state.transaction.date || moment().format("YYYY-MM-DD")}
+                            value={this.state.date}
                             showTodayButton
                             onChange={e => this.handleTransactionChange("date", moment(e._d).format("YYYY-MM-DD"))}
                         />
@@ -124,14 +140,14 @@ class TransactionModal extends Component {
                     <br></br>
                     <FormControl>
                         <InputLabel htmlFor="edit-transaction-type">Type</InputLabel>
-                        <Select onChange={e => this.handleTransactionChange("transaction_type_id", e.target.value)} value={this.state.transaction.transaction_type_id || 1}>
+                        <Select onChange={e => this.handleTransactionChange("transaction_type_id", e.target.value)} value={this.state.transaction_type_id}>
 						    {this.props.transactionTypes.map((type) => <MenuItem key={`type-${type.name}`} value={type.transaction_type_id}>{capitalizeFirstLetter(type.name)}</MenuItem>)}
 					    </Select>
                     </FormControl>
                     <br></br>
                     <FormControl>
                         <InputLabel htmlFor="edit-account">Account</InputLabel>
-                        <Select onChange={e => this.handleTransactionChange("account_id", e.target.value)} value={this.state.transaction.account_id || 0}>
+                        <Select onChange={e => this.handleTransactionChange("account_id", e.target.value)} value={this.state.account_id}>
 						    {this.props.accounts.map((account) => <MenuItem key={`account-${account.name}`} value={account.account_id}>{account.name}</MenuItem>)}
 					    </Select>
                     </FormControl>

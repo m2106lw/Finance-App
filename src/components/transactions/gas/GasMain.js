@@ -5,7 +5,7 @@ import moment from "moment";
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
-
+// Finance App
 import {getCars} from "../../api_calls/cars";
 import CarsTable from "../../cars/CarsTable";
 import {getGasByYear, getGasYears} from "../../api_calls/gas_transactions";
@@ -36,6 +36,7 @@ class GasMain extends Component {
 		this.setState({cars: cars, gasTransactions: gasTransactions, gasYears: gasYears, accounts: accounts});
 	}
 
+	// This will handle the year being updated
 	async handleYearSelection(year) {
 		// We will need to load transactions for the selected year's data
 		if (year != this.state.selectedYear) {
@@ -45,11 +46,13 @@ class GasMain extends Component {
 		}
 	}
 
+	// TODO: Add API calls
 	async postGasTransaction(transaction) {
 		console.log("postGas", transaction);
 		console.log("total", (transaction.price * transaction.gallons));
 	}
 	
+	// TODO: Allow for editing and deletion inside of the table
 	render(){
 		return(
 			<div className="gas-grid">

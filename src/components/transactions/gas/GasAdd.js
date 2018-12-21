@@ -6,61 +6,39 @@ import Button from '@material-ui/core/Button';
 
 import GasModal from './GasModal';
 
-const transaction = {
-    "price": 0.00,
-    "gallons": 0.00,
-    "date": moment().format('YYYY-MM-DD'),
-    "milage": 0,
-    "account_id": 0,
-    "car_id": 0,
-    "gas_id": -1
-};
-
 class GasAdd extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			modalOpen: false,
-			transaction: {}
+			transaction: {
+                price: 0.00,
+                gallons: 0.00,
+                date: moment().format('YYYY-MM-DD'),
+                milage: 0,
+                account_id: 0,
+                car_id: 0,
+                gas_id: -1
+            }
 		}
 		this.onModalClose = this.onModalClose.bind(this);
         this.handleModalOpen = this.handleModalOpen.bind(this);
-        this.createNewTransaction = this.createNewTransaction.bind(this);
-    }
-
-    onComponentDidMount() {
-        let transaction = this.createNewTransaction();
-        this.setState({modalOpen: false, transaction: transaction});
-    }
-    
-    createNewTransaction() {
-        let transaction = {
-            "price": 0.00,
-            "gallons": 0.00,
-            "date": moment().format('YYYY-MM-DD'),
-            "milage": 0,
-            "account_id": 0,
-            "car_id": 0,
-            "gas_id": -1
-        };
-        return transaction;
     }
 
 	onModalClose() {
-		this.setState({modalOpen: false, transaction: {}});
+		this.setState({modalOpen: false});
 	}
 
 	handleModalOpen(event) {
 		event.preventDefault();
 		// We need to update the default date to current date, no matter when open
 		// Maybe look at handling transaction defaults to TransactionModal
-		let transaction = this.createNewTransaction;
+		let transaction = this.state.transaction;
 		transaction["date"] = moment().format('YYYY-MM-DD');
 		this.setState({modalOpen: true, transaction: transaction});
     }
 	
 	render(){
-        console.log("render", this.state.transaction);
 		return(
 			<div>
 				<Button onClick={this.handleModalOpen} variant="contained" color="primary">Add a New Gas Transaction</Button>

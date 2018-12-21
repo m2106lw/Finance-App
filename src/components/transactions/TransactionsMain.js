@@ -52,7 +52,6 @@ class TransactionsMain extends Component {
 		
 		// Finally grab all fo the users accounts, for selection
 		let accounts = await getAccounts(user_id);
-		this.setState({accounts: accounts})
 
 		// TODO: Handle when data does not load
 		this.setState({
@@ -74,6 +73,7 @@ class TransactionsMain extends Component {
 		}
 	}
 	
+	// Checks for the passed inside of transaction years. Will simply return true or false.
 	checkForYear(value) {
 		return this.state.transactionYears.some(year => year.year === moment(value).year());
 	}
@@ -101,17 +101,14 @@ class TransactionsMain extends Component {
 		// Make axios call for insertion here, we need to wait for it so that we can get a actual transaction_id
 		let transaction_id = await post_transaction(transactionObject);
 
-		// Not sure if I want the new transaction visible when the year is different than the current one
-		// If the new or modified transaction has a year in its date that we don't already have then we will add it to our transactionYears list
-		// Otherwise there is no state to update
+		// If the newly created or updated transaction is not in the currently selected year then we just add the year to available years
+		// This way we don't display it should it not be in the same year as what's on the screen.
 		if (!this.checkForYear(transactionObject.date)) {
 			let transactionYears = this.state.transactionYears;
 			transactionYears.push({"year": moment(transactionObject.date).year()});
 			this.setState({transactionYears: transactionYears});
 		}
-		// Getting the year ir something below seems to break the transaction
 		else if (moment(transactionObject.date).year() == this.state.selectedYear) {
-
 			// We have to see if the transaction is a new or old one
 			let transactions = this.state.transactions;
 			let index = transactions.findIndex((transaction) => {
@@ -147,7 +144,6 @@ class TransactionsMain extends Component {
 		}
 		let transactions = this.state.transactions || [];
 
-		// Look into having TransactionTable handle the filtering
 		return(
 			<div className="transaction-grid">
 				<div className={"transaction-year-select"} style={{ width: "20%" }}>

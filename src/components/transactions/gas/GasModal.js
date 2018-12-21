@@ -23,62 +23,77 @@ class GasModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            transaction: {}
+            gas_id: -1,
+            milage:0,
+            price: 0.00,
+            date: moment().format("YYYY-MM-DD"),
+            car_id: 0,
+            account_id: 0,
+            gallons: 0
         }
         this.handeClose = this.handleClose.bind(this);
         this.handleTransactionChange = this.handleTransactionChange.bind(this);
         this.handleClose = this.handeClose.bind(this);
         this.handleCloseSave = this.handleCloseSave.bind(this);
+        this.emptyModal = this.emptyModal.bind(this);
     }
 
-    // Figure out if this is correct
-    // TODO: Check transactions - This may not be loading right - Its not
-    // TODO: Figure out how to handle a new transaction
     componentDidUpdate(prevProps) {
-        // We make deep copies of the data we want
-        if (JSON.stringify(this.props.transaction) !== JSON.stringify(prevProps.transaction)) {
-            let gas_id = this.props.transaction.gas_id;
-            let milage = this.props.transaction.milage;
-            let price = this.props.transaction.price;
-            let date = this.props.transaction.date;
-            let car_id = this.props.transaction.car_id;
-            let account_id = this.props.transaction.account_id;
-            let gallons = this.props.transaction.gallons;
-
-            console.log("gas_id", gas_id)
-
-            let transaction = {
-                gas_id: gas_id,
-                milage: milage,
-                price: price,
-                date: date,
-                car_id: car_id,
-                account_id: account_id,
-                gallons: gallons
-            }
-            this.setState({transaction: transaction});
+        // We check the gas id to see if we have a new gas transaction coming into the modal
+        if (prevProps.transaction.gas_id !== this.props.transaction.gas_id) {
+             // Now take the object that we recieved and break it into seperate parts to be editable
+             // This is done to a weird bug where something had to always remain in the value field with my previous implementation
+             this.setState({
+                gas_id: this.props.transaction.gas_id,
+                milage: this.props.transaction.milage,
+                price: this.props.transaction.price,
+                date:this.props.transaction.date,
+                car_id:this.props.transaction.car_id,
+                account_id: this.props.transaction.account_id,
+                gallons: this.props.transaction.gallons
+            })
         }
+    }
+
+    // This will empty the data - I think - so that we have a blank slate when open the modal
+    emptyModal() {
+        this.setState({
+            gas_id: -1,
+            milage:0,
+            price: 0.00,
+            date: moment().format("YYYY-MM-DD"),
+            car_id: 0,
+            account_id: 0,
+            gallons: 0
+        });
     }
 
     // This will save all data that has been changed, but not saved in the table.
     handleClose(event, reason) {
         event.preventDefault()
+        this.emptyModal();
         this.props.onModalClose();
-        this.setState({transaction: {}});
     }
 
     // This will pass the data needed to the main page component
     handleCloseSave() {
-        this.props.postGasTransaction(this.state.transaction);
+        let transaction = {
+            gas_id: this.state.gas_id,
+            milage: this.state.milage,
+            price: this.state.price,
+            date:this.state.date,
+            car_id:this.state.car_id,
+            account_id: this.state.account_id,
+            gallons: this.state.gallons
+        };
+        this.props.postGasTransaction(transaction);
+        this.emptyModal();
         this.props.onModalClose();
-        this.setState({transaction: {}});
     }
 
     // Update the transaction key on a change
     handleTransactionChange(key, value) {
- 		let transaction = this.state.transaction;
-        transaction[key] = value;
-        this.setState({transaction: transaction});
+        this.setState({[key]: value});
 	}
 
     // TODO: Figure out how to handle disabling buttons and stopping saving when data is incorrect
@@ -86,8 +101,6 @@ class GasModal extends Component {
     render() {
         if (this.props.isOpen === false)
             return null
-
-        console.log("modal transaction", this.state.transaction);
 
         return (
             <Dialog open={this.props.isOpen} onClose={this.handleClose} aria-labelledby="form-dialog-title">
@@ -99,7 +112,7 @@ class GasModal extends Component {
                     <MuiPickersUtilsProvider utils={MomentUtils}>
                         <DatePicker 
                             label="Date"
-                            value={this.state.transaction.date || moment().format("YYYY-MM-DD")}
+                            value={this.state.date}
                             showTodayButton
                             onChange={e => this.handleTransactionChange("date", moment(e._d).format("YYYY-MM-DD"))}
                         />
@@ -107,7 +120,7 @@ class GasModal extends Component {
                     <TextField
                         label="Price"
                         id="adornment-price"
-                        value={this.state.transaction.price || 0.00}
+                        value={this.state.price}
                         onChange={e => this.handleTransactionChange("price", e.target.value)}
                         InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
                         fullWidth
@@ -116,7 +129,7 @@ class GasModal extends Component {
                     <TextField
                         label="Milage"
                         id="adornment-milage"
-                        value={this.state.transaction.milage || 0}
+                        value={this.state.milage}
                         onChange={e => this.handleTransactionChange("milage", e.target.value)}
                         InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
                         fullWidth
@@ -125,7 +138,7 @@ class GasModal extends Component {
                     <TextField
                         label="Gallons"
                         id="adornment-gallons"
-                        value={this.state.transaction.milage || 0}
+                        value={this.state.gallons}
                         onChange={e => this.handleTransactionChange("gallons", e.target.value)}
                         InputProps={{startAdornment: <InputAdornment position="start">$</InputAdornment>}}
                         fullWidth
@@ -134,14 +147,14 @@ class GasModal extends Component {
                     <br></br>
                     <FormControl>
                         <InputLabel htmlFor="edit-car">Car</InputLabel>
-                        <Select onChange={e => this.handleTransactionChange("car_id", e.target.value)} value={this.state.transaction.car_id || 0}>
+                        <Select onChange={e => this.handleTransactionChange("car_id", e.target.value)} value={this.state.car_id}>
 						    {this.props.cars.map((car) => <MenuItem key={`type-${car.name}`} value={car.car_id}>{car.name}</MenuItem>)}
 					    </Select>
                     </FormControl>
                     <br></br>
                     <FormControl>
                         <InputLabel htmlFor="edit-account">Account</InputLabel>
-                        <Select onChange={e => this.handleTransactionChange("account_id", e.target.value)} value={this.state.transaction.account_id || 0}>
+                        <Select onChange={e => this.handleTransactionChange("account_id", e.target.value)} value={this.state.account_id}>
 						    {this.props.accounts.map((account) => <MenuItem key={`account-${account.name}`} value={account.account_id}>{account.name}</MenuItem>)}
 					    </Select>
                     </FormControl>

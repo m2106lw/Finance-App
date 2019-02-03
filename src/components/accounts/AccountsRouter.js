@@ -1,6 +1,6 @@
 import React, { Component} from "react";
 import {hot} from "react-hot-loader";
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 
 import AccountsMain from "./AccountsMain";
 import Account from "./Account";
@@ -12,6 +12,10 @@ class AccountsRouter extends Component {
 	}
 	
 	render() {
+		if (this.props.isAuthenticated == false || localStorage.getItem("token") === null) {
+			return <Redirect to='/login' />
+		}
+
 		return (
 			<div>
 				<Switch>

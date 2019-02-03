@@ -24,7 +24,15 @@ class App extends Component {
 	}
 	
 	handleAuthSucceed(auth_token) {
-		this.setState({user_id: 1, isAuthenticated: true, auth_token: auth_token});
+		// TODO: Error checking - unless handled by login page
+		localStorage.setItem("token", auth_token);
+		this.setState({isAuthenticated: true});
+	}
+
+	handleLogoutSucceed() {
+		// TODO: Error checking - unless handled by login page
+		localStorage.removeItem("token");
+		this.setState({isAuthenticated: false});
 	}
 	
 	render(){
@@ -47,4 +55,4 @@ class App extends Component {
 		);
 	}
 }
-export default hot(module)(App);
+export default hot(App);

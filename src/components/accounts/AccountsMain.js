@@ -3,7 +3,7 @@ import {hot} from "react-hot-loader";
 // Finance
 import AccountsMainTable from './AccountsMainTable';
 import AccountsMainAdd from './AccountsMainAdd';
-import {getAccounts, postAccount} from '../api_calls/accounts';
+import { get_accounts, create_account } from '../api_calls/accounts';
 
 class AccountsMain extends Component {
 	constructor(props) {
@@ -16,16 +16,18 @@ class AccountsMain extends Component {
 	}
 	
 	async componentDidMount() {
-		let accounts = await getAccounts(this.props.user_id);
+		let token = localStorage.getItem("token");
+		let accounts = await get_accounts(token);
 		this.setState({accounts: accounts});
 	}
 	
 	async addNewAccount(account) {
-		console.log(account);
-		let account_id = await postAccount(this.props.user_id, account.name, account.description);
-		console.log(account_id);
+		//console.log(account);
+		let token = localStorage.getItem("token");
+		let account_id = await create_account(token, account.name, account.description);
+		//console.log(account_id);
 		let newAccount = {"account_id": account_id, "name": account.name, "description": account.description, "balance": 0.00};
-		console.log(newAccount);
+		//console.log(newAccount);
 		let accounts = this.state.accounts;
 		accounts.push(newAccount);
 		this.setState({accounts: accounts});
@@ -43,4 +45,4 @@ class AccountsMain extends Component {
 		);
 	}
 }
-export default hot(module)(AccountsMain);
+export default AccountsMain;

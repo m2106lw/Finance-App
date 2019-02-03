@@ -5,7 +5,7 @@ import  { Redirect } from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 import AccountBalances from "./AccountBalances";
-import {getAccount} from "../api_calls/accounts";
+import {get_account} from "../api_calls/accounts";
 
 class Account extends Component {
 	constructor(props) {
@@ -17,9 +17,9 @@ class Account extends Component {
 	}
 	
 	async componentDidMount() {
-		let user_id = this.props.user_id;
+		let token = localStorage.getItem("token");
 		let account_id = this.props.match.params.id;
-		let account = await getAccount(user_id, account_id);
+		let account = await get_account(token, account_id);
 		this.setState({account: account, isLoading: false});
 	}
 	
